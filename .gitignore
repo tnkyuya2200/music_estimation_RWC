@@ -1,0 +1,9 @@
+*.wav
+*.db
+pretrained_models/
+__pycache__/
+.probe
+checkpoint
+model*
+pitch_estimation/result
+RWC/
