@@ -11,8 +11,10 @@ import warnings
 import copy
 import os
 import codecs
+import tensorflow as tf
 warnings.simplefilter('ignore')
 
+tf.compat.v1.disable_eager_execution()
 def make_chorddict():
     chord_dic = OrderedDict()
     one_third = 1.0/3
@@ -191,7 +193,7 @@ def compare(input, data):
     return sim_melody, sim_acc, sim_chords
 
 def spleeter_4stems_separate(y):
-    separator = Separator("spleeter:4stems", multiprocess=False)
+    separator = Separator("spleeter:4stems", multiprocess=True)
     prediction = separator.separate(y.T)
     prediction["vocals"] = prediction["vocals"].T
     prediction["drums"] = prediction["drums"].T
