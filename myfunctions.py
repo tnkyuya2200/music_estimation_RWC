@@ -193,13 +193,15 @@ def compare(input, data):
     return sim_melody, sim_acc, sim_chords
 
 def spleeter_4stems_separate(y):
+    result = {"vocals":[], "drums":[], "bass":[], "other":[]}
     separator = Separator("spleeter:4stems", multiprocess=True)
-    prediction = separator.separate(y.T)
-    prediction["vocals"] = prediction["vocals"].T
-    prediction["drums"] = prediction["drums"].T
-    prediction["bass"] = prediction["bass"].T
-    prediction["other"] = prediction["other"].T
-    return prediction
+    for i in range(0, y.shape[1], 20000000):
+        prediction = separator.separate(y.T)
+        result["vocals"].append(prediction["vocals"].T)
+        result["drums"].append(prediction["drums"].T)
+        result["bass"].append(prediction["bass"].T)
+        result["other"].append(prediction["other"].T)
+    return result
 
 def sep_quantize(arr, quantize):
     q_arr = arr.tolist()
