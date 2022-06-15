@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS music(
-id INTEGER PRIMARY KEY,
-no INTEGER,
+ID INTEGER PRIMARY KEY,
+NO INTEGER,
 Composer TEXT,
 Composer_Eng TEXT,
 Artist TEXT,
@@ -25,3 +25,6 @@ acc ARRAY,
 chords ARRAY,
 section ARRAY
 );
+
+.mode csv
+.import ./RWC/Data.csv music

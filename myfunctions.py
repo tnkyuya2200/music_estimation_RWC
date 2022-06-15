@@ -188,15 +188,14 @@ def compare_acc(input_acc, database_acc, separate=64):
 def compare(input, data):
     sim_melody = compare_melody(input.melody, data.melody)
     #sim_acc = compare_acc(input.acc, data.acc)
-    sim_acc = 0
     sim_chords = compare_acc(input.chords, data.chords)
-    return sim_melody, sim_acc, sim_chords
+    return sim_melody,  sim_chords
 
-def spleeter_4stems_separate(y):
+def spleeter_4stems_separate(y, sep=20000000):
     result = {"vocals":[], "drums":[], "bass":[], "other":[]}
     separator = Separator("spleeter:4stems", multiprocess=True)
-    for i in range(0, y.shape[1], 20000000):
-        prediction = separator.separate(y.T)
+    for i in range(0, y.shape[1], sep):
+        prediction = separator.separate(y[:,i:min(i+sep, m.y.shape[1])].T)
         result["vocals"].append(prediction["vocals"].T)
         result["drums"].append(prediction["drums"].T)
         result["bass"].append(prediction["bass"].T)
@@ -251,6 +250,7 @@ def chroma_in_beats(y, sr, beats=None, acc_wav=None):
             beats_count += 1
     return sum_chroma
 
+
 def compare_all(test_FilePath=None, test_music=None, db_FilePath="music.db"):
     db = Database(db_FilePath)
     if test_FilePath is None:
@@ -270,17 +270,17 @@ def compare_all(test_FilePath=None, test_music=None, db_FilePath="music.db"):
         x_q2 = copy.deepcopy(x)
         x_q2.analyze(2)
         if test.bpm < x.bpm*3/4:
-            vocal_sim, _, chords_sim = compare(test, x_q2)
+            vocal_sim, chords_sim = compare(test, x_q2)
             result[x.FilePath]["sim"]["vocal"] = vocal_sim
             result[x.FilePath]["sim"]["chords"] = chords_sim
             result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
         elif test.bpm > x.bpm*3/2:
-            vocal_sim, _, chords_sim = compare(test_q2, x)
+            vocal_sim, chords_sim = compare(test_q2, x)
             result[x.FilePath]["sim"]["vocal"] = vocal_sim
             result[x.FilePath]["sim"]["chords"] = chords_sim
             result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
         else:
-            vocal_sim, _, chords_sim = compare(test,x)
+            vocal_sim, chords_sim = compare(test,x)
             result[x.FilePath]["sim"]["vocal"] = vocal_sim
             result[x.FilePath]["sim"]["chords"] = chords_sim
             result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
@@ -335,8 +335,8 @@ def compare_all(test_FilePath=None, test_music=None, db_FilePath="music.db"):
 def init_database(con, cur):
     query = """
 CREATE TABLE IF NOT EXISTS music(
-id INTEGER PRIMARY KEY,
-no INTEGER,
+ID INTEGER PRIMARY KEY,
+NO INTEGER,
 Composer TEXT,
 Composer_Eng TEXT,
 Artist TEXT,

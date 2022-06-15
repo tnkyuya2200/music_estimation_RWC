@@ -11,7 +11,7 @@ for ID in tqdm(range(1,db.getdbsize()[0]+1)):
     x = db.load_ID(ID)
     m = fn.Music()
     m.load_database(x)
-//    m.analyze()
+    m.analyze()
     query = """
 UPDATE music SET beats = ?, bpm = ?, melody = ?, acc = ?, chords = ?
     where ID == ?;
