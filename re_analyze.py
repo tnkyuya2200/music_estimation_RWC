@@ -7,10 +7,8 @@ if len(sys.argv) == 1:
 else:
     db = fn.Database(sys.argv[1])
 
-for ID in tqdm(range(1,db.getdbsize()[0]+1)):
-    x = db.load_ID(ID)
-    m = fn.Music()
-    m.load_database(x)
+for ID in tqdm(range(1,db.getdbsize()+1, leave=False, position=1)):
+    m = db.load_Music_by_ID(ID)
     m.analyze()
     query = """
 UPDATE music SET beats = ?, bpm = ?, melody = ?, acc = ?, chords = ?

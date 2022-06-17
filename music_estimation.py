@@ -10,7 +10,7 @@ from tqdm import tqdm
 result = {}
 filename = os.path.join("result", "result_tmp2", os.path.split(os.path.dirname(sys.argv[1]))[1], "result.json")
 
-for arg in tqdm(sys.argv[1:], position=0):
+for arg in tqdm(sys.argv[1:], leave=False, position=1):
     result[arg] = fn.compare_all(test_path=arg)
 result["timestamp"] = datetime.now().isoformat()
 

@@ -5,7 +5,7 @@ from logging import StreamHandler, Formatter, INFO, getLogger
 from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
 
-db = fn.Database()
+db = fn.Database("music.db")
 def init_logger():
     handler = StreamHandler()
     handler.setLevel(INFO)
@@ -32,7 +32,7 @@ UPDATE music SET beats = ?, bpm = ?, melody = ?, acc = ?, chords = ?
     where ID == ?;
     """
     with ProcessPoolExecutor() as executor:
-        for single_result in tqdm(executor.map(task,  range(1,db.getdbsize()[0]+1))):
+        for single_result in tqdm(executor.map(task, range(1,db.getdbsize()[0]+1))):
             print(single_result)
             db.cur.execute(query, single_result)
 
