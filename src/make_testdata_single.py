@@ -22,13 +22,14 @@ def main():
 	sf.write(os.path.join(dir_name, "noise", str(ID)+".noise_"+str(noise_change)+".wav"), y_with_noise.T, m.sr)
 
 	#TODO: snipped test data
-	length_time = round(random.randrange(60, 180))
+	length_time = random.randrange(60, np.min((180, librosa.samples_to_time(y_length, m.sr)/0.8)))
 	length_samples = librosa.time_to_samples(length_time, m.sr)
 	max_start_samples = y_length - length_samples
 	start_samples = random.randrange(0, max_start_samples)
 	end_samples = start_samples + length_samples
 	y_snipped = m.y[:, start_samples:end_samples]
-	sf.write(os.path.join(dir_name, "snipped", str(ID)+".noise_"+str(start_samples)+"_"+str(end_samples)+".wav"), y_snipped.T, m.sr)
+	sf.write(os.path.join(dir_name, "snipped", str(ID)+".snipped_"+str(start_samples)+"_"+str(end_samples)+".wav"), y_snipped.T, m.sr)
+
 	speed_change = round(random.uniform(0.5, 1.5), 2)
 	if speed_change > 0.9 and speed_change < 1.1:
 		speed_change = round(random.uniform(0.5, 1.5))
