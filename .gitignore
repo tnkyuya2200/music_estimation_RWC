@@ -1,5 +1,6 @@
 *.wav
 *.db
+*.bat
 pretrained_models/
 __pycache__/
 .probe
