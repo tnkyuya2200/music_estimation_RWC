@@ -2,21 +2,15 @@
 import numpy as np
 import librosa
 from tqdm import tqdm
-from spleeter.separator import Separator
+# from spleeter.separator import Separator
 from collections import OrderedDict
-import json
 import sqlite3
 import io
-import warnings
 import copy
 import os
-import codecs
-import tensorflow as tf
-import soundfile as sf
 import csv
-warnings.simplefilter('ignore')
+import warnings
 
-tf.compat.v1.disable_eager_execution()
 def make_chorddict():
 	chord_dic = OrderedDict()
 	one_third = 1.0/3
@@ -261,23 +255,23 @@ def compare(input_music, database_music):
 	sim_chords = compare_acc(input_music.chords, database_music.chords)
 	return sim_melody,  sim_chords
 
-def spleeter_4stems_separate(y, sep=20000000):
-	"""
-	input:
-		y np.ndarray, shape=(2,samples): input wav series
-		sep int: separate unit
-	output (vocals, other):
-		vocals np.ndarray, shape=(2,samples): predicted vocals
-		other np.ndarray, shape=(2,samples): predicted acc
-	"""
-	vocals = np.empty(y.shape)
-	other = np.empty(y.shape)
-	separator = Separator("spleeter:4stems")
-	for i in range(0, y.shape[1], sep):
-		prediction = separator.separate(y[:, i:min(i+sep, y.shape[1])].T)
-		vocals[:, i:min(i+sep, y.shape[1])] = prediction["vocals"].T
-		other[:, i:min(i+sep, y.shape[1])] = prediction["other"].T
-	return (vocals, other)
+# def spleeter_4stems_separate(y, sep=20000000):
+# 	"""
+# 	input:
+# 		y np.ndarray, shape=(2,samples): input wav series
+# 		sep int: separate unit
+# 	output (vocals, other):
+# 		vocals np.ndarray, shape=(2,samples): predicted vocals
+# 		other np.ndarray, shape=(2,samples): predicted acc
+# 	"""
+# 	vocals = np.empty(y.shape)
+# 	other = np.empty(y.shape)
+# 	separator = Separator("spleeter:4stems")
+# 	for i in range(0, y.shape[1], sep):
+# 		prediction = separator.separate(y[:, i:min(i+sep, y.shape[1])].T)
+# 		vocals[:, i:min(i+sep, y.shape[1])] = prediction["vocals"].T
+# 		other[:, i:min(i+sep, y.shape[1])] = prediction["other"].T
+# 	return (vocals, other)
 
 def sep_quantize(arr, quantize):
 	"""
@@ -313,53 +307,51 @@ def f0_in_beats(vocals, beats, sr, quantize=8):
 	f0 = (list(map(lambda x:round(x-12), librosa.hz_to_midi(librosa.yin(librosa.to_mono(vocals),fmin=65,fmax=2093,sr=sr)))))
 	output = []
 	threshold = np.percentile(abs(vocals), 25)
+	mono_vocals = librosa.to_mono(vocals)
 	for index in range(len(q_beats)-1):
 		note = np.median(f0[q_beats[index]:q_beats[index+1]])
-		if np.median(np.abs(vocals[q_beats[index]*512:q_beats[index+1]*512])) < threshold or note >= 80 :
+		if np.median(np.abs(mono_vocals[q_beats[index]*512:q_beats[index+1]*512])) < threshold or note >= 80 :
 			output.append(np.nan)
 		else:
 			output.append(note)
 	return np.array(output)
 
-def compare_all(test_music, db_FilePath="music.db"):
+def compare_all(test_music, db):
 	"""
 	input:
 		test_music Music: Music object to compare
-		db_Filepath str: database filepath
+		db str: Database object to compare
 	output dict{"sim":"vocals", "chords", "average"}:
 		"sim":"vocals" float64: vocal simirality score
 		"sim":"chords" float64: chords simirality score
 		"sim":"average" float64: final simirality score
 	"""
-	db = Database(db_FilePath)
-	test = Music()
-	test.load_music(test_FilePath)
-	test.analyze(4)
-	datas = db.load_all()
+	test_music.analyze_music(4)
+
 	result = {}
 
-	test_q2 = copy.deepcopy(test)
-	test_q2.analyze(2)
-
-	for x in tqdm(datas, leave=False, position=1):
-		result[x.FilePath] = {"sim":{}}
-		x_q2 = copy.deepcopy(x)
-		x_q2.analyze(2)
-		if test.bpm < x.bpm*3/4:
-			vocal_sim, chords_sim = compare(test, x_q2)
-			result[x.FilePath]["sim"]["vocal"] = vocal_sim
-			result[x.FilePath]["sim"]["chords"] = chords_sim
-			result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
-		elif test.bpm > x.bpm*3/2:
+	for ID in tqdm(range(1,db.getdbsize()), leave=False, position=1):
+		result[ID] = {"sim":{}}
+		x = db.load_Music_by_ID(ID)
+		if test_music.bpm < x.bpm*3/4:
+			vocal_sim, chords_sim = compare(test_music, x_q2)
+			x_q2 = copy.deepcopy(x)
+			x_q2.analyze_music(2)
+			result[ID]["sim"]["vocal"] = vocal_sim
+			result[ID]["sim"]["chords"] = chords_sim
+			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+		elif test_music.bpm > x.bpm*3/2:
 			vocal_sim, chords_sim = compare(test_q2, x)
-			result[x.FilePath]["sim"]["vocal"] = vocal_sim
-			result[x.FilePath]["sim"]["chords"] = chords_sim
-			result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+			test_q2 = copy.deepcopy(test_music)
+			test_q2.analyze_music(2)
+			result[ID]["sim"]["vocal"] = vocal_sim
+			result[ID]["sim"]["chords"] = chords_sim
+			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 		else:
-			vocal_sim, chords_sim = compare(test,x)
-			result[x.FilePath]["sim"]["vocal"] = vocal_sim
-			result[x.FilePath]["sim"]["chords"] = chords_sim
-			result[x.FilePath]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+			vocal_sim, chords_sim = compare(test_music,x)
+			result[ID]["sim"]["vocal"] = vocal_sim
+			result[ID]["sim"]["chords"] = chords_sim
+			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 	return result
 
 class Database:
@@ -411,6 +403,7 @@ chords ARRAY
 );
 		"""
 		self.con.execute(query)
+		self.con.execute("INSERT INTO music (ID) VALUES (0);")
 		open_csv = open(csv_Path, encoding="utf-8")
 		read_csv = csv.reader(open_csv)
 
@@ -475,7 +468,11 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 			music Music: music data to insert
 		"""
 		query = "INSERT INTO music("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
-		cur.execute(query, music.to_list())
+		self.cur.execute(query, music.to_list())
+	def getIDlist(self):
+		query = "select ID from music;"
+		self.cur.execute(query)
+		return list(map(lambda x:x[0], db.cur.fetchall()))
 
 class Music:
 	ID = None           # Song ID                               int
@@ -500,13 +497,16 @@ class Music:
 		(self.ID, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
 		self.esti_vocals, self.esti_acc, self.melody, self.chords) = tuple(data)
 		self.y, self.sr = librosa.load(self.FilePath, mono=False)
-	def analyze_music(self):
+		self.y = librosa.util.normalize(self.y, axis=1)
+	def analyze_music(self, quantize=4):
+		self.quantize = int(quantize)
 		self.bpm, self.beats = librosa.beat.beat_track(y=librosa.to_mono(self.y), sr=self.sr)
 		vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)
+		self.sep_beats(self.quantize)
 		self.melody = sep_count(vocals_f0)
 		self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
-	def separate_music(self):
-		self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
+	# def separate_music(self):
+	# 	self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
 	def sep_beats(self, quantize):
 		self.beats = sep_quantize(self.beats, quantize)
 		self.bpm = self.bpm * quantize/4
