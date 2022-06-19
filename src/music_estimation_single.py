@@ -5,12 +5,42 @@ import myfunctions as fn
 import sys, os
 import json
 from datetime import datetime
-from tqdm import tqdm
+import numpy as np
 
-result = {}
-filename = os.path.join("tmp.json")
 db = fn.Database(sys.argv[1])
-result = fn.compare_all(db.load_Music_by_ID(0), db)
+IDs = db.getIDlist()
+
+result = {"test_ID": sys.argv[2]}
+print(os.path.splitext(os.path.basename(sys.argv[2]))[0])
+result["db_ID"] = {}
+filename = os.path.join("result", os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
+
+test_music = db.load_Music_by_ID(0)
+test_music.analyze_music(4)
+test_music_q2 = db.load_Music_by_ID(0)
+test_music_q2.analyze_music(2)
+
+for ID in IDs[1:]:
+	result["db_ID"][ID] = {"sim":{}}
+	x = db.load_Music_by_ID(ID)
+	if test_music.bpm < x.bpm*3/4:
+		x_q2 = db.load_Music_by_ID(ID)
+		x_q2.analyze_music(2)
+		vocal_sim, chords_sim = fn.compare(test_music, x_q2)
+		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
+		result["db_ID"][ID]["sim"]["chords"] = chords_sim
+		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	elif test_music.bpm > x.bpm*3/2:
+		vocal_sim, chords_sim = fn.compare(test_music_q2, x)
+		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
+		result["db_ID"][ID]["sim"]["chords"] = chords_sim
+		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	else:
+		vocal_sim, chords_sim = fn.compare(test_music, x)
+		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
+		result["db_ID"][ID]["sim"]["chords"] = chords_sim
+		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+
 result["timestamp"] = datetime.now().isoformat()
 
 file = open(filename, "w", encoding="utf-8")

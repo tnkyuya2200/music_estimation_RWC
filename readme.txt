@@ -19,4 +19,5 @@ music_estimation.bash [database file] [directory name]
 	recognizes musics in directory name using database file
 
 all_jobs.bash [database file] [csv file] [directory name]
+	do all job series
 music.db has 278 datas

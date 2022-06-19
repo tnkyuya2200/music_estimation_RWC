@@ -1,8 +1,7 @@
 #!/bin/bash
 
-for file in $(ls $2); do
-	./src/make_testdata_single.py $1 file
-	./src/separete_single.py $1 0
-	./src/analyze_single.py $1 0
-	./src/music_estimation_single.py $1
+for file in $2/*; do
+	python src/insert_test_music.py $1 $file
+	python src/separate_single.py $1 0
+	python src/music_estimation_single.py $1 $file
 done

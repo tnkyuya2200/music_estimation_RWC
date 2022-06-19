@@ -22,7 +22,7 @@ def main():
 	sf.write(os.path.join(dir_name, "noise", str(ID)+".noise_"+str(noise_change)+".wav"), y_with_noise.T, m.sr)
 
 	#TODO: snipped test data
-	length_time = random.randrange(60, np.min((180, librosa.samples_to_time(y_length, m.sr)/0.8)))
+	length_time = random.randrange(60, np.min((180, round(librosa.samples_to_time(y_length, m.sr)*0.8))))
 	length_samples = librosa.time_to_samples(length_time, m.sr)
 	max_start_samples = y_length - length_samples
 	start_samples = random.randrange(0, max_start_samples)

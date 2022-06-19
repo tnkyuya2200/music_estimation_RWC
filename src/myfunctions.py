@@ -334,21 +334,21 @@ def compare_all(test_music, db):
 		result[ID] = {"sim":{}}
 		x = db.load_Music_by_ID(ID)
 		if test_music.bpm < x.bpm*3/4:
-			vocal_sim, chords_sim = compare(test_music, x_q2)
 			x_q2 = copy.deepcopy(x)
 			x_q2.analyze_music(2)
+			vocal_sim, chords_sim = compare(test_music, x_q2)
 			result[ID]["sim"]["vocal"] = vocal_sim
 			result[ID]["sim"]["chords"] = chords_sim
 			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 		elif test_music.bpm > x.bpm*3/2:
-			vocal_sim, chords_sim = compare(test_q2, x)
 			test_q2 = copy.deepcopy(test_music)
 			test_q2.analyze_music(2)
+			vocal_sim, chords_sim = compare(test_q2, x)
 			result[ID]["sim"]["vocal"] = vocal_sim
 			result[ID]["sim"]["chords"] = chords_sim
 			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 		else:
-			vocal_sim, chords_sim = compare(test_music,x)
+			vocal_sim, chords_sim = compare(test_music, x)
 			result[ID]["sim"]["vocal"] = vocal_sim
 			result[ID]["sim"]["chords"] = chords_sim
 			result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
