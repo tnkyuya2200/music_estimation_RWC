@@ -6,12 +6,13 @@ import sys, os
 import json
 from datetime import datetime
 import numpy as np
+import warnings
+warnings.simplefilter("error")
 
 db = fn.Database(sys.argv[1])
 IDs = db.getIDlist()
 
 result = {"test_ID": sys.argv[2]}
-print(os.path.splitext(os.path.basename(sys.argv[2]))[0])
 result["db_ID"] = {}
 filename = os.path.join("result", os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
 

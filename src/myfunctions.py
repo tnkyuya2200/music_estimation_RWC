@@ -172,7 +172,9 @@ def compare_melody(input_melody, database_melody):
 						if np.isnan(input_sample[i+lag]) and np.isnan(db_sample[i]):
 							both_nan += 1
 					is_nan = np.isnan(diff)
-					med = np.median([x for i,x in enumerate(diff) if not(is_nan[i])])
+					med = np.nan
+					if not all(is_nan):
+						med = np.median([x for i,x in enumerate(diff) if not(is_nan[i])])
 					sim_lag.append((len([i for i, x in enumerate(diff) if abs(x-med)<=0.6])+both_nan)/len(diff))
 			else:
 				for lag in range(len(db_sample)-len(input_sample)+1):
@@ -183,7 +185,9 @@ def compare_melody(input_melody, database_melody):
 						if np.isnan(input_sample[i]) and np.isnan(db_sample[i+lag]):
 							both_nan += 1
 					is_nan = np.isnan(diff)
-					med = np.median([x for i,x in enumerate(diff) if not(is_nan[i])])
+					med = np.nan
+					if not all(is_nan):
+						med = np.median([x for i, x in enumerate(diff) if not(is_nan[i])])
 					sim_lag.append((len([i for i, x in enumerate(diff) if abs(x-med)<=0.6])+both_nan)/len(diff))
 			sim_db.append(max(sim_lag))
 		sim.append(max(sim_db))
