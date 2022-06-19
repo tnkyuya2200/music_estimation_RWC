@@ -2,12 +2,22 @@ import myfunctions as fn
 from tqdm import tqdm
 from spleeter.separator import Separator
 import tensorflow as tf
-import sys
+import sys, os
 import warnings
 import numpy as np
+import logging
 
 def main():
 	tf.compat.v1.disable_eager_execution()
+	os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+	print(os.environ["TF_CPP_MIN_LOG_LEVEL"])
+	warnings.simplefilter(action="ignore", category=FutureWarning)
+	warnings.simplefilter(action="ignore", category=Warning)
+	tf.get_logger().setLevel("INFO")
+	tf.autograph.set_verbosity(0)
+	tf.get_logger().setLevel(logging.ERROR)
+	tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.WARN)
+	
 
 	db = fn.Database(sys.argv[1])
 	ID = int(sys.argv[2])

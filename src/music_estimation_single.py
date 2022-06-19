@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 import numpy as np
 import warnings
+from tqdm import tqdm
 warnings.simplefilter("error")
 
 db = fn.Database(sys.argv[1])
@@ -21,7 +22,7 @@ test_music.analyze_music(4)
 test_music_q2 = db.load_Music_by_ID(0)
 test_music_q2.analyze_music(2)
 
-for ID in IDs[1:]:
+for ID in tqdm(IDs[1:], desc="[estimating "+sys.argv[2]+"]"):
 	result["db_ID"][ID] = {"sim":{}}
 	x = db.load_Music_by_ID(ID)
 	if test_music.bpm < x.bpm*3/4:
