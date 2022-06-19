@@ -15,7 +15,6 @@ def main():
 	"""
 	data = (m.beats, m.bpm, m.frame_size, m.quantize, m.melody, m.chords, m.ID)
 	db.cur.execute(query, data)
-	print("ID:" + str(ID) + " analyzed completed!")
 
 if __name__ == "__main__":
 	main()

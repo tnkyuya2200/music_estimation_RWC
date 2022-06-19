@@ -28,7 +28,6 @@ def main():
 	"""
 	data = (esti_vocals, esti_acc, m.ID)
 	db.cur.execute(query, data)
-	print("ID:" + str(ID) + " separated completed!")
 
 if __name__ == "__main__":
 	main()
