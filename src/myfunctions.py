@@ -472,7 +472,7 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	def getIDlist(self):
 		query = "select ID from music;"
 		self.cur.execute(query)
-		return list(map(lambda x:x[0], db.cur.fetchall()))
+		return list(map(lambda x:x[0], self.cur.fetchall()))
 
 class Music:
 	ID = None           # Song ID                               int
