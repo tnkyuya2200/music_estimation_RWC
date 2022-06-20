@@ -5,7 +5,7 @@ import sys, os
 from datetime import datetime
 from tqdm import tqdm
 import json
-
+"""
 def get_db(result_path):
     db = fn.Database()
     query = "select name, artist from music where path == ?;"
@@ -41,3 +41,13 @@ for input_filename, db_files in tqdm(input_dict.items()):
         #print("\t\t"+get_db(sim_rank_in_all[i])+"\n\t\t\tscore: "+str(db_files[sim_rank_in_all[i]]["sim"]["average"]))
     print("\n")
     sim_rank_in_all[0]["ID"]
+"""
+def main():
+    
+    file = open("test.json", "r", encoding="utf-8")
+    input_dict = json.load(file)
+    print(max(input_dict["db"], key=lambda x:x["sim"]["chords"])["ID"])
+    test_ID = int(os.path.basename(input_dict["test_file"]).split("_")[0])
+    test_type = int(os.path.basename(input_dict["test_file"]).split("_")[1])
+if __name__ == "__main__":
+    main()
