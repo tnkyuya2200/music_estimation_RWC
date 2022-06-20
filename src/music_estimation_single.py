@@ -14,7 +14,7 @@ db = fn.Database(sys.argv[1])
 IDs = db.getIDlist()
 
 result = {"test_file": sys.argv[2]}
-result["db_ID"] = {}
+result["db"] = [] 
 filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
 test_music = db.load_Music_by_ID(0)
 test_music.analyze_music(4)
@@ -22,25 +22,21 @@ test_music_q2 = db.load_Music_by_ID(0)
 test_music_q2.analyze_music(2)
 
 for ID in tqdm(IDs[1:], desc="[estimating "+sys.argv[2]+"]"):
-	result["db_ID"][ID] = {"sim":{}}
+	tmp_dict = {"ID":ID, "sim":{}}
 	x = db.load_Music_by_ID(ID)
+	vocal_sim, chords_sim = (0, 0)
 	if test_music.bpm < x.bpm*3/4:
 		x_q2 = db.load_Music_by_ID(ID)
 		x_q2.analyze_music(2)
 		vocal_sim, chords_sim = fn.compare(test_music, x_q2)
-		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
-		result["db_ID"][ID]["sim"]["chords"] = chords_sim
-		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 	elif test_music.bpm > x.bpm*3/2:
 		vocal_sim, chords_sim = fn.compare(test_music_q2, x)
-		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
-		result["db_ID"][ID]["sim"]["chords"] = chords_sim
-		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
 	else:
 		vocal_sim, chords_sim = fn.compare(test_music, x)
-		result["db_ID"][ID]["sim"]["vocal"] = vocal_sim
-		result["db_ID"][ID]["sim"]["chords"] = chords_sim
-		result["db_ID"][ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	tmp_dict["sim"]["vocal"] = vocal_sim
+	tmp_dict["sim"]["chords"] = chords_sim
+	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	result["db"].append(tmp_dict)
 
 result["timestamp"] = datetime.now().isoformat()
 

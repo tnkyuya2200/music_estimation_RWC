@@ -15,9 +15,9 @@ analyze.bash [database file] [start] [end]
 analyze_all_ID.bash [database file]
 	analyze musics in database file
 
-music_estimation.bash [database file] [directory name]
+music_estimation.bash [database file] [directory name] [output dir]
 	recognizes musics in directory name using database file
 
-all_jobs.bash [database file] [csv file] [directory name]
+all_jobs.bash [database file] [csv file] [directory name] [output dir]
 	do all job series
 music.db has 278 datas
