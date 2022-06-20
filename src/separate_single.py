@@ -10,7 +10,6 @@ import logging
 def main():
 	tf.compat.v1.disable_eager_execution()
 	os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-	print(os.environ["TF_CPP_MIN_LOG_LEVEL"])
 	warnings.simplefilter(action="ignore", category=FutureWarning)
 	warnings.simplefilter(action="ignore", category=Warning)
 	tf.get_logger().setLevel("INFO")

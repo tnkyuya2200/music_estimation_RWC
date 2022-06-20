@@ -1,7 +1,10 @@
 #!/bin/bash
 
+# $1: database file
+# $2: test data dir
+ 
 python src/get_all_ID.py $1 > IDlist.txt
-mkdir -p $2/{noise,pitch,raw,snipped,speed}
+mkdir -p $2/
 
 python src/get_all_ID.py $1 > IDlist.txt
 for i in $(cat IDlist.txt); do

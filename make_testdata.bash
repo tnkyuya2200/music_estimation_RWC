@@ -1,7 +1,6 @@
 #!/bin/bash
 
 mkdir -p $2
-mkdir -p $2/{noise, pitch, row, snhipped, speed}
 echo ID, start_samples, end_samples, speed_change, pitch_change > $2/changes.csv
 
 for ((i=$3; i<=$4; i++)); do

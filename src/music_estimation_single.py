@@ -13,10 +13,9 @@ warnings.simplefilter("error")
 db = fn.Database(sys.argv[1])
 IDs = db.getIDlist()
 
-result = {"test_ID": sys.argv[2]}
+result = {"test_file": sys.argv[2]}
 result["db_ID"] = {}
-filename = os.path.join("result", os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
-
+filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
 test_music = db.load_Music_by_ID(0)
 test_music.analyze_music(4)
 test_music_q2 = db.load_Music_by_ID(0)
