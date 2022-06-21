@@ -8,7 +8,28 @@ from datetime import datetime
 import numpy as np
 import warnings
 from tqdm import tqdm
+import joblib
+from pathos.multiprocessing import ProcessingPool
+from typing import Optional
 warnings.simplefilter("error")
+
+def task(test_music, test_music_q2, x, x_q2, ID):
+	tmp_dict = {"ID":ID, "sim":{}}
+	#x = db.load_Music_by_ID(ID)
+	vocal_sim, chords_sim = (0, 0)
+	if test_music.bpm < x.bpm*3/4:
+		#x_q2 = db.load_Music_by_ID(ID)
+		x_q2.analyze_music(2)
+		vocal_sim, chords_sim = fn.compare(test_music, x_q2)
+	elif test_music.bpm > x.bpm*3/2:
+		vocal_sim, chords_sim = fn.compare(test_music_q2, x)
+	else:
+		vocal_sim, chords_sim = fn.compare(test_music, x)
+	tmp_dict["sim"]["vocal"] = vocal_sim
+	tmp_dict["sim"]["chords"] = chords_sim
+	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	return tmp_dict
+
 def main():
 	db = fn.Database(sys.argv[1])
 	IDs = db.getIDlist()
@@ -20,23 +41,13 @@ def main():
 	test_music.analyze_music(4)
 	test_music_q2 = db.load_Music_by_ID(0)
 	test_music_q2.analyze_music(2)
-
-	for ID in tqdm(IDs[1:], desc="[estimating "+sys.argv[2]+"]"):
-		tmp_dict = {"ID":ID, "sim":{}}
-		x = db.load_Music_by_ID(ID)
-		vocal_sim, chords_sim = (0, 0)
-		if test_music.bpm < x.bpm*3/4:
-			x_q2 = db.load_Music_by_ID(ID)
-			x_q2.analyze_music(2)
-			vocal_sim, chords_sim = fn.compare(test_music, x_q2)
-		elif test_music.bpm > x.bpm*3/2:
-			vocal_sim, chords_sim = fn.compare(test_music_q2, x)
-		else:
-			vocal_sim, chords_sim = fn.compare(test_music, x)
-		tmp_dict["sim"]["vocal"] = vocal_sim
-		tmp_dict["sim"]["chords"] = chords_sim
-		tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
-		result["db"].append(tmp_dict)
+	
+	x_list = []
+	x_q2_list = []
+	for ID in IDs[1:]:
+		x_list.append(db.load_Music_by_ID(ID))
+		x_q2_list.append(db.load_Music_by_ID(ID))
+	result["db"] = joblib.Parallel(n_jobs=-1, verbose=2)(joblib.delayed(task)(test_music, test_music_q2, x, x_q2, ID) for test_music, test_music_q2, x, x_q2, ID in zip([test_music]*len(IDs), [test_music_q2]*len(IDs), x_list, x_q2_list, IDs[1:]))
 
 	result["timestamp"] = datetime.now().isoformat()
 

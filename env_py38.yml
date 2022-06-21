@@ -15,7 +15,6 @@ dependencies:
   - libstdcxx-ng=11.2.0=h1234567_0
   - ncurses=6.3=h7f8727e_2
   - openssl=1.1.1o=h166bdaf_0
-  - pip=21.2.4=py38h06a4308_0
   - python=3.8.13=h12debd9_0
   - python_abi=3.8=2_cp38
   - readline=8.1.2=h7f8727e_1
@@ -36,7 +35,10 @@ dependencies:
     - cffi==1.15.0
     - charset-normalizer==2.0.12
     - click==7.1.2
+    - cupy-cuda112==10.5.0
     - decorator==5.1.1
+    - dill==0.3.5.1
+    - fastrlock==0.8
     - ffmpeg-python==0.2.0
     - flatbuffers==1.12
     - future==0.18.2
@@ -60,6 +62,7 @@ dependencies:
     - librosa==0.8.0
     - llvmlite==0.36.0
     - markdown==3.3.7
+    - multiprocess==0.70.13
     - norbert==0.2.1
     - numba==0.53.1
     - numpy==1.19.5
@@ -67,8 +70,12 @@ dependencies:
     - opt-einsum==3.3.0
     - packaging==21.3
     - pandas==1.4.2
+    - pathos==0.2.9
+    - pip==22.1.2
     - pooch==1.6.0
-    - protobuf==3.20.1
+    - pox==0.3.1
+    - ppft==1.7.6.5
+    - protobuf==3.19.4
     - pyasn1==0.4.8
     - pyasn1-modules==0.2.8
     - pycparser==2.21
@@ -82,10 +89,11 @@ dependencies:
     - rsa==4.8
     - scikit-learn==1.1.1
     - scipy==1.8.1
+    - silence-tensorflow==1.2.0
     - six==1.15.0
     - sniffio==1.2.0
     - soundfile==0.10.3.post1
-    - spleeter==2.3.0
+    - spleeter==2.3.1
     - tensorboard==2.9.0
     - tensorboard-data-server==0.6.1
     - tensorboard-plugin-wit==1.8.1
@@ -99,4 +107,3 @@ dependencies:
     - werkzeug==2.1.2
     - wrapt==1.12.1
     - zipp==3.8.0
-prefix: /home/tanaka/.conda/envs/py38_GPU

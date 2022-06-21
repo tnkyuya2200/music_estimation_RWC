@@ -481,7 +481,6 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		query = "select ID, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music;"
 		self.cur.execute(query)
 		output_list = self.cur.fetchall()
-		print(output_list)
 		music_list = []
 		for output in output_list:
 			music = Music()

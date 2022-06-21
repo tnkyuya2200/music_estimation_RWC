@@ -21,3 +21,5 @@ music_estimation.bash [database file] [directory name] [output dir]
 all_jobs.bash [database file] [csv file] [directory name] [output dir]
 	do all job series
 music.db has 278 datas
+
+conda env create -f <.yml>

@@ -9,39 +9,30 @@ import numpy as np
 import warnings
 from tqdm import tqdm
 import joblib
+from pathos.multiprocessing import ProcessingPool
 from typing import Optional
+import concurrent.futures
+import copy
 warnings.simplefilter("error")
 
-def tqdm_joblib(total: Optional[int] = None, **kwargs):
-
-	pbar = tqdm(total=total, miniters=1, smoothing=0, **kwargs)
-
-	class TqdmBatchCompletionCallback(joblib.parallel.BatchCompletionCallBack):
-		def __call__(self, *args, **kwargs):
-			pbar.update(n=self.batch_size)
-			return super().__call__(*args, **kwargs)
-
-	old_batch_callback = joblib.parallel.BatchCompletionCallBack
-	joblib.parallel.BatchCompletionCallBack = TqdmBatchCompletionCallback
-
-	try:
-		yield pbar
-	finally:
-		joblib.parallel.BatchCompletionCallBack = old_batch_callback
-		pbar.close()
-
-def task(ID):
+def task(test_music, test_music_q2, x, ID):
+	print("\tID:", ID, "estimation starts")
 	tmp_dict = {"ID":ID, "sim":{}}
-	x = db.load_Music_by_ID(ID)
+	#x = db.load_Music_by_ID(ID)
 	vocal_sim, chords_sim = (0, 0)
 	if test_music.bpm < x.bpm*3/4:
-		x_q2 = db.load_Music_by_ID(ID)
+		#x_q2 = db.load_Music_by_ID(ID)
+		x_q2 = copy.deepcopy(x)
 		x_q2.analyze_music(2)
 		vocal_sim, chords_sim = fn.compare(test_music, x_q2)
 	elif test_music.bpm > x.bpm*3/2:
 		vocal_sim, chords_sim = fn.compare(test_music_q2, x)
 	else:
 		vocal_sim, chords_sim = fn.compare(test_music, x)
+	tmp_dict["sim"]["vocal"] = vocal_sim
+	tmp_dict["sim"]["chords"] = chords_sim
+	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	print("\tID:", ID, "estimation ends")
 	return tmp_dict
 
 def main():
@@ -53,13 +44,26 @@ def main():
 	filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
 	test_music = db.load_Music_by_ID(0)
 	test_music.analyze_music(4)
-	test_music_q2 = db.load_Music_by_ID(0)
+	test_music_q2 = copy.deepcopy(test_music)
 	test_music_q2.analyze_music(2)
-	with tqdm_joblib():
-		results = joblib.Parallel(n_jobs=-1)(delayed(task)(i) for ID in IDs[1:])
-	for result in results:
-		result["db"].append(tmp_dict)
+	
+	#x_q2_list = []
+	#result["db"] = joblib.Parallel(n_jobs=-1, verbose=2)(joblib.delayed(task)(test_music, test_music_q2, x, x_q2, ID) for test_music, test_music_q2, x, x_q2, ID in zip([test_music]*len(IDs), [test_music_q2]*len(IDs), x_list, x_q2_list, IDs[1:]))
 
+	with concurrent.futures.ProcessPoolExecutor() as executor:
+		futures = []
+		result["db"] = []
+		for ID in IDs[1:]:
+			print("ID:", ID, "submit start")
+			futures.append(
+				executor.submit(
+					task, test_music, test_music_q2, 
+					db.load_Music_by_ID(ID), 
+					ID
+				)
+			)
+			print("ID:", ID, "submit end")
+		result["db"] = [f.result() for f in futures]
 	result["timestamp"] = datetime.now().isoformat()
 
 	file = open(filename, "w", encoding="utf-8")
