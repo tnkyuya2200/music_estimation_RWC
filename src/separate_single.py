@@ -6,6 +6,7 @@ import sys, os
 import warnings
 import numpy as np
 import logging
+import librosa
 
 def main():
 	tf.compat.v1.disable_eager_execution()
@@ -21,6 +22,8 @@ def main():
 	db = fn.Database(sys.argv[1])
 	ID = int(sys.argv[2])
 	m = db.load_Music_by_ID(ID)
+	m.y , m.sr = librosa.load(m.FilePath, mono=False)
+	m.y = librosa.util.normalize(m.y, axis=1)
 
 	esti_vocals = np.empty(m.y.shape)
 	esti_acc = np.empty(m.y.shape)

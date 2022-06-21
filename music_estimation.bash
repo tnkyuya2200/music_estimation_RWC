@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 # $1: database file
 # $2: test data dir

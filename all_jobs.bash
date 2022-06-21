@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 # $1 - database file
 # $2 - csv file
@@ -10,6 +10,7 @@ rm $3 -r
 rm $4/*
 
 bash init_database.bash $1 $2
-#bash make_testdata_all_ID.bash $1 $3
+bash separate_all_ID.bash $1
 bash analyze_all_ID.bash $1
+bash make_testdata_all_ID.bash $1 $3
 bash music_estimation.bash $1 $3 $4

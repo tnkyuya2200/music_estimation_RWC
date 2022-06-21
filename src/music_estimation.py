@@ -16,6 +16,7 @@ import copy
 warnings.simplefilter("error")
 
 def task(test_music, test_music_q2, x, ID):
+	print("ID:", ID, "starts!")
 	tmp_dict = {"ID":ID, "sim":{}}
 	#x = db.load_Music_by_ID(ID)
 	vocal_sim, chords_sim = (0, 0)
@@ -31,6 +32,7 @@ def task(test_music, test_music_q2, x, ID):
 	tmp_dict["sim"]["vocal"] = vocal_sim
 	tmp_dict["sim"]["chords"] = chords_sim
 	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+	print("\tID:", ID, "ends!")
 	return tmp_dict
 
 def main():
@@ -48,17 +50,17 @@ def main():
 	#x_q2_list = []
 	#result["db"] = joblib.Parallel(n_jobs=-1, verbose=2)(joblib.delayed(task)(test_music, test_music_q2, x, x_q2, ID) for test_music, test_music_q2, x, x_q2, ID in zip([test_music]*len(IDs), [test_music_q2]*len(IDs), x_list, x_q2_list, IDs[1:]))
 
-	with concurrent.futures.ProcessPoolExecutor() as executor:
-		futures = []
-		result["db"] = []
-		for ID in tqdm(IDs[1:], desc="estimating "+sys.argv[2], position=0, leave=True):
-			futures.append(
-				executor.submit(
-					task, test_music, test_music_q2, 
-					db.load_Music_by_ID(ID), 
-					ID
-				)
-			)
+	with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
+		with tqdm(total=len(IDs[1:]), desc="estimating "+sys.argv[2]) as progress:
+			futures = []
+			result["db"] = []
+			for ID in IDs[1:]:
+				future = executor.submit(
+					task, test_music, test_music_q2,
+					db.load_Music_by_ID(ID), ID
+					)
+				future.add_done_callback(lambda p: progress.update())
+				futures.append(future)
 		result["db"] = [f.result() for f in futures]
 	result["timestamp"] = datetime.now().isoformat()
 

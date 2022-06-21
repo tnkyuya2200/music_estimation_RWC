@@ -9,6 +9,9 @@ make_testdata_all_ID.bash [database file] [output directory]
 	make testdata for datas in database file whose ID from start to end
 	outputs changes to changes.csv
 
+separate.bash [database file]
+	separate music in database file
+
 analyze.bash [database file] [start] [end]
 	analyze musics from start to end
 

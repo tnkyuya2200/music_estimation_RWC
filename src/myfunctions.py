@@ -455,7 +455,7 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		output Music: loaded music
 		"""
 		music = Music()
-		query = "select ID, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music where ID = ?;"
+		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music where ID = ?;"
 		self.cur.execute(query, (ID,))
 		music.load_database(self.cur.fetchone())
 		return music
@@ -478,10 +478,9 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		self.cur.execute(query)
 		return list(map(lambda x:x[0], self.cur.fetchall()))
 	def loadAllMusic(self):
-		query = "select ID, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music;"
+		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music;"
 		self.cur.execute(query)
 		output_list = self.cur.fetchall()
-		print(output_list)
 		music_list = []
 		for output in output_list:
 			music = Music()
@@ -506,14 +505,12 @@ class Music:
 	def load_music(self, FilePath):
 		self.ID = 0
 		self.FilePath = FilePath
-		self.y, self.sr = librosa.load(FilePath, sr=None, mono=False)
-		self.y = librosa.util.normalize(self.y, axis=1)
 	def load_database(self, data):
-		(self.ID, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
+		(self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
 		self.esti_vocals, self.esti_acc, self.melody, self.chords) = tuple(data)
+	def analyze_music(self, quantize=4):
 		self.y, self.sr = librosa.load(self.FilePath, mono=False)
 		self.y = librosa.util.normalize(self.y, axis=1)
-	def analyze_music(self, quantize=4):
 		self.quantize = int(quantize)
 		self.bpm, self.beats = librosa.beat.beat_track(y=librosa.to_mono(self.y), sr=self.sr)
 		vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)
