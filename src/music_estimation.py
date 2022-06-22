@@ -16,7 +16,6 @@ import copy
 warnings.simplefilter("error")
 
 def task(test_music, test_music_q2, x, ID):
-	print("ID:", ID, "starts!")
 	tmp_dict = {"ID":ID, "sim":{}}
 	#x = db.load_Music_by_ID(ID)
 	vocal_sim, chords_sim = (0, 0)
@@ -32,7 +31,6 @@ def task(test_music, test_music_q2, x, ID):
 	tmp_dict["sim"]["vocal"] = vocal_sim
 	tmp_dict["sim"]["chords"] = chords_sim
 	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
-	print("\tID:", ID, "ends!")
 	return tmp_dict
 
 def main():
@@ -43,14 +41,14 @@ def main():
 	result["db"] = [] 
 	filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
 	test_music = db.load_Music_by_ID(0)
-	test_music.analyze_music(4)
+	test_music.load_and_analyze_music(4)
 	test_music_q2 = copy.deepcopy(test_music)
 	test_music_q2.analyze_music(2)
 	
 	#x_q2_list = []
 	#result["db"] = joblib.Parallel(n_jobs=-1, verbose=2)(joblib.delayed(task)(test_music, test_music_q2, x, x_q2, ID) for test_music, test_music_q2, x, x_q2, ID in zip([test_music]*len(IDs), [test_music_q2]*len(IDs), x_list, x_q2_list, IDs[1:]))
 
-	with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
+	with concurrent.futures.ProcessPoolExecutor() as executor:
 		with tqdm(total=len(IDs[1:]), desc="estimating "+sys.argv[2]) as progress:
 			futures = []
 			result["db"] = []

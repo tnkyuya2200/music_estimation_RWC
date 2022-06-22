@@ -508,9 +508,11 @@ class Music:
 	def load_database(self, data):
 		(self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
 		self.esti_vocals, self.esti_acc, self.melody, self.chords) = tuple(data)
-	def analyze_music(self, quantize=4):
+	def load_and_analyze_music(self, quantize=4):
 		self.y, self.sr = librosa.load(self.FilePath, mono=False)
 		self.y = librosa.util.normalize(self.y, axis=1)
+		self.analyze_music(quantize)
+	def analyze_music(self, quantize=4):
 		self.quantize = int(quantize)
 		self.bpm, self.beats = librosa.beat.beat_track(y=librosa.to_mono(self.y), sr=self.sr)
 		vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)

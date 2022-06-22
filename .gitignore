@@ -2,7 +2,7 @@
 *.db
 *.bat
 *.json
-result/
+screenlog.*
 pretrained_models/
 __pycache__/
 .probe
