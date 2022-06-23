@@ -1,53 +1,47 @@
 #coding:utf-8
-import myfunctions as fn
 import numpy as np
 import sys, os
-from datetime import datetime
-from tqdm import tqdm
 import json
-"""
-def get_db(result_path):
-    db = fn.Database()
-    query = "select name, artist from music where path == ?;"
-    db.cur.execute(query, (result_path,))
-    name, artist = db.cur.fetchall()[0]
-    result = name + " by " + artist
-    return result
+from glob import glob
 
-def get_keys_from_value(d, val):
-    return [k for k, v in d.items() if v == val]
-
-file = open(sys.argv[1], "r", encoding="utf-8")
-input_dict = json.load(file)
-
-for input_filename, db_files in tqdm(input_dict.items()):
-    if not(type(db_files) is dict):
-        continue
-    sim_rank_in_vocal = sorted(db_files, key=lambda x:db_files[x]["sim"]["vocal"], reverse=True)
-    sim_rank_in_chords = sorted(db_files, key=lambda x:db_files[x]["sim"]["chords"], reverse=True)
-    sim_rank_in_all = sorted(db_files, key=lambda x:(db_files[x]["sim"]["vocal"]+db_files[x]["sim"]["chords"])/2, reverse=True)
-    #sim_rank_in_all = sorted(db_files, key=lambda x:db_files[x]["sim"]["average"], reverse=True)
-
-    print(input_filename + " is estimated to be ")
-    print("\tin vocal")
-    for i in range(3):
-        print("\t\t"+get_db(sim_rank_in_vocal[i])+"\n\t\t\tscore: "+str(db_files[sim_rank_in_vocal[i]]["sim"]["vocal"]))
-    print("\tin chords")
-    for i in range(3):
-        print("\t\t"+get_db(sim_rank_in_chords[i])+"\n\t\t\tscore: "+str(db_files[sim_rank_in_chords[i]]["sim"]["chords"]))
-    print("\tin all features")
-    for i in range(3):
-        print("\t\t"+get_db(sim_rank_in_all[i])+"\n\t\t\tscore: "+str((db_files[sim_rank_in_all[i]]["sim"]["vocal"]+db_files[sim_rank_in_all[i]]["sim"]["chords"])/2))
-        #print("\t\t"+get_db(sim_rank_in_all[i])+"\n\t\t\tscore: "+str(db_files[sim_rank_in_all[i]]["sim"]["average"]))
-    print("\n")
-    sim_rank_in_all[0]["ID"]
-"""
 def main():
     
-    file = open("test.json", "r", encoding="utf-8")
-    input_dict = json.load(file)
-    print(max(input_dict["db"], key=lambda x:x["sim"]["chords"])["ID"])
-    test_ID = int(os.path.basename(input_dict["test_file"]).split("_")[0])
-    test_type = int(os.path.basename(input_dict["test_file"]).split("_")[1])
+    filename_list = glob(sys.argv[1])
+
+    result_dict = {
+        "all": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},
+        "noise": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},
+        "pitch": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},
+        "raw": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},
+        "snipped": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},
+        "speed": {"vocal": 0, "chords": 0, "average": 0, "deno": 0}
+    }
+    attr_list = ["vocal", "chords", "average"]
+    for filename in filename_list:
+        file = open(filename, "r", encoding="utf-8")
+        input_dict = json.load(file)
+        ID_type = os.path.splitext(os.path.basename(input_dict["test_file"]))[0]
+        test_ID = int(ID_type.split("_")[0])
+        test_type = ID_type.split("_")[1]
+        db_list = input_dict["db"]
+
+        result_dict["all"]["deno"] += 1
+        result_dict[test_type]["deno"] += 1
+
+        for attr in ["vocal", "chords", "average"]:
+            result_dict["all"][attr] += (max(db_list, key=lambda x: x["sim"][attr])["ID"] == test_ID)
+            result_dict[test_type][attr] += (max(db_list, key=lambda x: x["sim"][attr])["ID"] == test_ID)
+
+    print("type\tvocal\t\t\tchords\t\t\taverage")
+    for test_type, data in result_dict.items():
+        score = {}
+        deno = data["deno"]
+        print(test_type, end="\t")
+        for attr in attr_list:
+            score[attr] = data[attr] / deno * 100
+            #print("{: >6.2f}".format(score[attr]*100), "%", "(", data[attr], "/", data["deno"], ")", end="\t")
+            print(f"{score[attr]: >8.4f}%  ({data[attr]: >4}/{deno: >4})\t", end="")
+        print()
+        
 if __name__ == "__main__":
     main()
