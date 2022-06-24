@@ -6,7 +6,7 @@ from glob import glob
 
 def main():
     
-    filename_list = glob(sys.argv[1])
+    filename_list = glob(sys.argv[1] + "/*")
 
     result_dict = {
         "all": {"vocal": 0, "chords": 0, "average": 0, "deno": 0},

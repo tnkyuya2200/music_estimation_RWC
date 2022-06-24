@@ -1,4 +1,4 @@
-name: py38_GPU
+name: py38_ME
 channels:
   - conda-forge
   - defaults
