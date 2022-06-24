@@ -35,7 +35,7 @@ This initializes database [database file] with [csv file]
 	- noise: The music with noise
 	- pitch: The music transposed in ±5 (excludes 0)
 	- speed: The speed of music changed between ×0.50 to ×1.50 (excludes ×1)
-	- snipped: The snipped music lasts 1 minute to 180 seconds or 0.8 times the length of the music
+	- snipped: The snipped music lasts 1 minute to whichever shorter 180 seconds or 0.8 times the length of the music
 
 	3.2 Prepare test data with your own
 	You may prepare the test data on your own.
