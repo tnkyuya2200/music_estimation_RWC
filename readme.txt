@@ -82,3 +82,5 @@ $ bash all_jobs.bash [database file] [csv file] [test data dir] [output dir]
 
 You may get this project by:
 $ git clone https://github.com/tnkyuya2200/music_estimation_RWC
+
+git is hard
