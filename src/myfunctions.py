@@ -416,35 +416,7 @@ chords ARRAY
 			data = [None] * 25
 			data[:len(row)] = row
 			rows.append(data)
-		query = """
-INSERT INTO music (
-ID,
-NO,
-Composer,
-Composer_Eng,
-Artist,
-Artist_Eng,
-Title,
-Title_Eng,
-CD,
-Track_No,
-Genre,
-Genre_Eng,
-Sub_Genre,
-Sub_Genre_ENG,
-FilePath,
-y,
-sr,
-beats,
-bpm,
-frame_size,
-quantize,
-esti_vocals,
-esti_acc,
-melody,
-chords)
-VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-"""
+		query = "INSERT INTO music (" + music.schema() + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 		self.cur.executemany(query, rows)
 		open_csv.close()
 
@@ -478,7 +450,7 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		self.cur.execute(query)
 		return list(map(lambda x:x[0], self.cur.fetchall()))
 	def loadAllMusic(self):
-		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music;"
+		query = "select" + music.schema() + "from music;"
 		self.cur.execute(query)
 		output_list = self.cur.fetchall()
 		music_list = []
@@ -528,4 +500,9 @@ class Music:
 		return (self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size,
 			self.quantize, self.esti_vocals, self.esti_acc, self.melody, self.chords)
 	def schema(self):
-		return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords"
+		result = ""
+		for key in self.__dict__.keys():
+			result += key + ", "
+		return result[:-2]
+	def numSchema(self):
+		return len(self.__dict__.keys())
