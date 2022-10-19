@@ -2,6 +2,10 @@
 *.db
 *.bat
 *.json
+RWC
+data
+database
+result
 screenlog.*
 pretrained_models/
 __pycache__/

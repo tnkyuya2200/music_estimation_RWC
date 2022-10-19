@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 db = fn.Database("music.db")
 def task(m):
-	m.analyze_music()
+	m.load_and_analyze_music()
 	return (m.y, m.sr, m.beats, m.bpm, m.frame_size, m.quantize, m.melody, m.chords, m.ID)
 
 def main():
