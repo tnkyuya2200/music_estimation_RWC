@@ -529,3 +529,5 @@ class Music:
 			self.quantize, self.esti_vocals, self.esti_acc, self.melody, self.chords)
 	def schema(self):
 		return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords"
+	def STFT_AF(self):
+		return 0

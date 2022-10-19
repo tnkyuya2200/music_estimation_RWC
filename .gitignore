@@ -5,6 +5,7 @@
 RWC
 data
 database
+database/
 result
 screenlog.*
 pretrained_models/
