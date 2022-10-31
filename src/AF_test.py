@@ -24,5 +24,3 @@ for frame in range(y_stft.shape[1]-1):
     print(int(frame_result[freq, frame]), end=", ")
   print(": 0x{:0>8x}".format(list_to_bit(frame_result[:, frame])))
   #result = list_to_bit(frame_result[:, frame])
-
-
