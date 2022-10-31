@@ -31,13 +31,13 @@ def main():
 	sf.write(os.path.join(dir_name, str(ID)+"_snipped_"+str(start_samples) + "-"+str(end_samples)+".wav"), y_snipped.T, m.sr)
 
 	speed_change = round(random.uniform(0.5, 1.5), 2)
-	if speed_change > 0.9 and speed_change < 1.1:
-		speed_change = round(random.uniform(0.5, 1.5))
+	while speed_change > 0.9 and speed_change < 1.1:
+		speed_change = round(random.uniform(0.5, 1.5), 2)
 	y_speed_change = np.array([librosa.effects.time_stretch(m.y[0,:], speed_change), librosa.effects.time_stretch(m.y[1,:], speed_change)])
 	sf.write(os.path.join(dir_name, str(ID)+"_speed_"+str(speed_change)+".wav"), y_speed_change.T, m.sr)
 
 	pitch_change = random.randrange(-5, 5)
-	if pitch_change == 0:
+	while pitch_change == 0:
 		pitch_change = random.randrange(-5, 5)
 	y_pitch_change = np.array([librosa.effects.pitch_shift(m.y[0,:], m.sr, pitch_change),librosa.effects.pitch_shift(m.y[1,:], m.sr, pitch_change)])
 	sf.write(os.path.join(dir_name, str(ID)+"_pitch_"+str(pitch_change)+".wav"), y_pitch_change.T, m.sr)

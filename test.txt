@@ -1,0 +1,12 @@
+database/music_vocals.db
+testdata
+result
+ID: 56 started!
+ID: 58 started!
+	ID: 58 ended!
+ID: 59 started!
+	ID: 59 ended!
+ID: 60 started!
+	ID: 60 ended!
+ID: 57 started!
+	ID: 57 ended!

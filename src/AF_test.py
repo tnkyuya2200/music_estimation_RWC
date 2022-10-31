@@ -9,16 +9,20 @@ list_to_bit = lambda list:np.sum([bit * 2**i for i, bit in enumerate(list)])
 
 db = fn.Database("database/music_light.db")
 
-m = db.load_Music_by_ID(7)
+m = db.load_Music_by_ID(1)
 mono_y = librosa.to_mono(m.y)
 y_stft = np.abs(librosa.stft(librosa.to_mono(m.y)))
 
-result = np.ndarray((32, y_stft.shape[1]), dtype='bool')
+frame_result = np.ndarray((32, y_stft.shape[1]), dtype='bool')
+result = np.ndarray((y_stft.shape[1]), dtype='int8')
 for frame in range(y_stft.shape[1]-1):
   print(frame, end=":\t")
   for freq in range(0, 32):
-    result[freq, frame] = \
+    frame_result[freq, frame] = \
       conv_stft(freq, frame+1) - conv_stft(freq+1, frame+1) -\
          conv_stft(freq, frame) + conv_stft(freq+1, frame) > 0
-    print(int(result[freq, frame]), end=", ")
-  print(": 0x{:0>8x}".format(list_to_bit(result[:, frame])))
+    print(int(frame_result[freq, frame]), end=", ")
+  print(": 0x{:0>8x}".format(list_to_bit(frame_result[:, frame])))
+  #result = list_to_bit(frame_result[:, frame])
+
+
