@@ -16,25 +16,17 @@ print(y_chroma.shape)
 frame_result = np.ndarray((y_chroma.shape[0], y_chroma.shape[1]), dtype='bool')
 
 for frame in range(y_chroma.shape[1]-1):
-	print(frame, end=":\t")
+	print(f"{frame: >5}: ", end="")
 	for chroma in range(y_chroma.shape[0]-1):
 		frame_result[chroma, frame] = \
-			y_chroma[chroma][frame] - y_chroma[chroma+1][frame] > 0
+			y_chroma[chroma][frame+1] - y_chroma[chroma+1][frame+1]  -\
+				y_chroma[chroma][frame] + y_chroma[chroma+1][frame]> 0
 		print(int(frame_result[chroma, frame]), end="")
-	frame_result[11, frame] = \
-		y_chroma[11][frame] - y_chroma[0][frame] > 0
-	print(int(frame_result[11, frame]))
-
-"""
-for frame in range(y_chroma.shape[1]-1):
-	print(frame, end=":\t")
-	for chroma in range(y_chroma.shape[0]-1):
-		frame_result[chroma, frame] = \
-			y_chroma[chroma][frame+1] - y_chroma[chroma+1][frame+1] -\
-				y_chroma[chroma][frame] - y_chroma[chroma+1][frame] > 0
-		print(int(frame_result[chroma, frame]), end="")
+		if chroma % 4 == 3:
+			print(end=" ")
 	frame_result[11, frame] = \
 		y_chroma[11][frame+1] - y_chroma[0][frame+1] -\
-			y_chroma[11][frame] - y_chroma[0][frame] > 0
-	print(int(frame_result[11, frame]))
-"""
+			y_chroma[11][frame] + y_chroma[0][frame]> 0
+	print(int(frame_result[11, frame]), end="")
+	print(f" : 0x{list_to_bit(frame_result[:, frame]):0>3x}")
+print(f"size: ({y_chroma.shape[0]}, {y_chroma.shape[1]-1})")

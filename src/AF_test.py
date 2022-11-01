@@ -16,11 +16,14 @@ y_stft = np.abs(librosa.stft(librosa.to_mono(m.y)))
 frame_result = np.ndarray((32, y_stft.shape[1]), dtype='bool')
 result = np.ndarray((y_stft.shape[1]), dtype='int8')
 for frame in range(y_stft.shape[1]-1):
-  print(frame, end=":\t")
+  print(f"{frame: >5}:", end="")
   for freq in range(0, 32):
     frame_result[freq, frame] = \
       conv_stft(freq, frame+1) - conv_stft(freq+1, frame+1) -\
          conv_stft(freq, frame) + conv_stft(freq+1, frame) > 0
-    print(int(frame_result[freq, frame]), end=", ")
-  print(": 0x{:0>8x}".format(list_to_bit(frame_result[:, frame])))
+    if freq % 4 == 0:
+      print(end=" ")
+    print(int(frame_result[freq, frame]), end="")
+  print(" : 0x{:0>8x}".format(list_to_bit(frame_result[:, frame])))
   #result = list_to_bit(frame_result[:, frame])
+print(f"size: (32, {y_stft.shape[1]-1})")
