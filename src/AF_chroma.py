@@ -9,7 +9,7 @@ list_to_bit = lambda list:np.sum([bit * 2**i for i, bit in enumerate(list)])
 
 db = fn.Database("database/music_light.db")
 
-m = db.load_Music_by_ID(1)
+m = db.load_Music_by_ID(0)
 mono_y = librosa.to_mono(m.y)
 y_chroma = librosa.feature.chroma_stft(librosa.to_mono(m.y))
 print(y_chroma.shape)

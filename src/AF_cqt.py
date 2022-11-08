@@ -7,7 +7,7 @@ list_to_bit = lambda list:np.sum([bit * 2**i for i, bit in enumerate(list)])
 
 db = fn.Database("database/music_light.db")
 
-m = db.load_Music_by_ID(1)
+m = db.load_Music_by_ID(0)
 mono_y = librosa.to_mono(m.y)
 y_cqt = librosa.cqt(librosa.to_mono(m.y))
 

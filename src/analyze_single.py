@@ -8,7 +8,7 @@ def main():
 	db = fn.Database(sys.argv[1])
 	ID = int(sys.argv[2])
 	m = db.load_Music_by_ID(ID)
-	m.analyze_music()
+	m.load_and_analyze_music()
 	query = """
 	UPDATE music SET y = ?, sr = ?, beats = ?, bpm = ?, frame_size = ?, quantize = ?, melody = ?, chords = ?
 	where ID == ?;
