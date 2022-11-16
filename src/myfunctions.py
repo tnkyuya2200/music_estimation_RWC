@@ -237,7 +237,7 @@ def compare_acc(acc1, acc2, separate=64):
 		sim = []
 		for index_shorter in range(shorter_acc.shape[1]//separate):
 			shorter_sample = rolled_shorter_acc[:,index_shorter*separate:min((index_shorter+1)*separate, shorter_acc.shape[1]-1)]
-			sim_index = []
+			sim_index = [0]
 			for index_longer in range(longer_acc.shape[1]-separate):
 				longer_sample = longer_acc[:,index_longer:index_longer+separate]
 				sim_index.append(corr_cossim(shorter_sample, longer_sample))
@@ -536,5 +536,25 @@ class Music:
 			self.quantize, self.esti_vocals, self.esti_acc, self.melody, self.chords)
 	def schema(self):
 		return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords"
-	def STFT_AF(self):
-		return 0
+	def cqt_AF(self):
+		y_cqt = librosa.cqt(librosa.to_mono(m.y))
+		frame_result = np.ndarray((y_cqt.shape[0]-1, y_cqt.shape[1]), dtype='bool')
+		result = np.ndarray((y_cqt.shape[1]), dtype='int32')
+		for frame in range(y_cqt.shape[1]-1):
+			for nbin in range(y_cqt.shape[0]-1):
+				frame_result[nbin, frame] = \
+					y_cqt[nbin][frame+1] - y_cqt[nbin+1][frame+1] -\
+						y_cqt[nbin][frame] + y_cqt[nbin+1][frame] > 0
+				result.append(frame_result)
+		return result
+	def cqt_beat_AF(self):
+		y_cqt = librosa.cqt(librosa.to_mono(m.y))
+		frame_result = np.ndarray((y_cqt.shape[0]-1, y_cqt.shape[1]), dtype='bool')
+		result = np.ndarray((y_cqt.shape[1]), dtype='int32')
+		for n_beat in range(len(self.beats)-2):
+			for n_bin in range(y_cqt.shape[0]-1):
+				beat_result[n_bin, n_beat] = \
+					conv_stft(n_bin, n_beat+1) - conv_stft(n_bin+1, n_beat+1) -\
+						conv_stft(n_bin, n_beat) + conv_stft(n_bin+1, n_beat) > 0
+				result.append(beat_result)
+		return result

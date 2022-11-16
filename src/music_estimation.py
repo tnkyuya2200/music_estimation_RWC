@@ -13,6 +13,7 @@ from pathos.multiprocessing import ProcessingPool
 from typing import Optional
 import concurrent.futures
 import copy
+import time
 warnings.simplefilter("error")
 
 def task(test_music, test_music_q2, x, ID):
@@ -36,6 +37,7 @@ def task(test_music, test_music_q2, x, ID):
 	return tmp_dict
 
 def main():
+	time_start = time.perf_counter()
 	db = fn.Database(sys.argv[1])
 	IDs = db.getIDlist()
 
@@ -61,6 +63,7 @@ def main():
 			futures.append(future)
 		result["db"] = [f.result() for f in futures]
 	result["timestamp"] = datetime.now().isoformat()
+	result["elap_time"] = time.perf_counter() - time_start
 
 	file = open(filename, "w", encoding="utf-8")
 	json.dump(result, file, indent=2, ensure_ascii=False)
