@@ -22,10 +22,22 @@ $ bash init_database.bash [database file] [csv file]
 
 This initializes database [database file] with [csv file]
 
+3. Analyze the music
 
-3. Prepare test data
+	Execute the following command:
+	$ bash separate_all_ID.bash [database file]
+		This command separates music in the [database file].
+		Results are stored in the database.
 
-	3.1 Prepare test data with the command
+	$ bash analyze_all_ID.bash	[database file]
+		This command analyzes all music in the [database file].
+		Results are stored in the database.
+
+	Notice You have to do the job in the order.
+
+4. Prepare test data
+
+	4.1 Prepare test data with the command
 	Execute the following command:
 	$	bash make_testdata_all_ID.bash [database file] [output directory]
 
@@ -37,22 +49,10 @@ This initializes database [database file] with [csv file]
 	- speed: The speed of music changed between ×0.50 to ×1.50 (excludes ×1)
 	- snipped: The snipped music lasts 1 minute to whichever shorter 180 seconds or 0.8 times the length of the music
 
-	3.2 Prepare test data with your own
+	4.2 Prepare test data with your own
 	You may prepare the test data on your own.
 	Put the song in a directory.
 
-4. Analyze the music
-
-	Execute the following command:
-	$ bash separate.bash [database file]
-		This command separates music in the [database file].
-		Results are stored in the database.
-
-	$ bash analyze_all_ID.bash	[database file]
-		This command analyzes all music in the [database file].
-		Results are stored in the database.
-	
-	Notice that you have to execute commands in this order.
 
 5. Recognize Music
 

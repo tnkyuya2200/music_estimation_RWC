@@ -35,7 +35,7 @@ def main():
 		esti_acc[:, i:min(i+sep, m.y.shape[1])] = prediction["other"].T
 
 	query = """
-	UPDATE music SET esti_vocals = ? , esti_acc = ?
+	UPDATE features SET esti_vocals = ? , esti_acc = ?
 	where ID == ?;
 	"""
 	data = (esti_vocals, esti_acc, m.ID)
