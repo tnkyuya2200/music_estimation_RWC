@@ -375,49 +375,57 @@ class Database:
 		self.con.isolation_level = None
 	def __del__(self):
 		self.con.close()
-	def init_database(self, csv_Path="RWC/Data.csv"):
-		self.con.execute("DROP TABLE IF EXISTS music;")
-		query = """
-CREATE TABLE IF NOT EXISTS music(
-ID INTEGER PRIMARY KEY,
-NO INTEGER,
-Composer TEXT,
-Composer_Eng TEXT,
-Artist TEXT,
-Artist_Eng TEXT,
-Title TEXT,
-Title_Eng TEXT,
-CD TEXT,
-Track_No TEXT,
-Genre TEXT,
-Genre_Eng TEXT,
-Sub_Genre TEXT,
-Sub_Genre_ENG TEXT,
-FilePath TEXT,
-y ARRAY,
-sr INTEGER,
-beats ARRAY,
-bpm INTEGER,
-frame_size INTEGER,
-quantize INTEGER,
-esti_vocals ARRAY,
-esti_acc ARRAY,
-melody ARRAY,
-chords ARRAY
+	def init_database(self, csv_Path="Data_light.csv"):
+		self.con.execute("DROP TABLE IF EXISTS info;")
+		self.con.execute("DROP TABLE IF EXISTS features;")
+		info_query = """
+CREATE TABLE IF NOT EXISTS info(
+	ID INTEGER PRIMARY KEY,
+	NO INTEGER,
+	Composer TEXT,
+	Composer_Eng TEXT,
+	Artist TEXT,
+	Artist_Eng TEXT,
+	Title TEXT,
+	Title_Eng TEXT,
+	CD TEXT,
+	Track_No TEXT,
+	Genre TEXT,
+	Genre_Eng TEXT,
+	Sub_Genre TEXT,
+	Sub_Genre_ENG TEXT,
+	FilePath TEXT
 );
 		"""
-		self.con.execute(query)
-		self.con.execute("INSERT INTO music (ID) VALUES (0);")
+		feature_query = """
+CREATE TABLE IF NOT EXISTS features(
+	ID INTEGER PRIMARY KEY,
+	FilePath TEXT,
+	y ARRAY,
+	sr INTEGER,
+	beats ARRAY,
+	bpm INTEGER,
+	frame_size INTEGER,
+	quantize INTEGER,
+	esti_vocals ARRAY,
+	esti_acc ARRAY,
+	melody ARRAY,
+	chords ARRAY
+);
+		"""
+		self.con.execute(info_query)
+		self.con.execute(feature_query)
+		self.con.execute("INSERT INTO features (ID) VALUES (0);")
 		open_csv = open(csv_Path, encoding="utf-8")
 		read_csv = csv.reader(open_csv)
 
-		rows = []
+		info_rows = []
+		feature_rows = []
 		for row in read_csv:
-			data = [None] * 25
-			data[:len(row)] = row
-			rows.append(data)
-		query = """
-INSERT INTO music (
+			info_rows.append(row)
+			feature_rows.append([row[0], row[14]])
+		info_query = """
+INSERT INTO info (
 ID,
 NO,
 Composer,
@@ -432,20 +440,19 @@ Genre,
 Genre_Eng,
 Sub_Genre,
 Sub_Genre_ENG,
-FilePath,
-y,
-sr,
-beats,
-bpm,
-frame_size,
-quantize,
-esti_vocals,
-esti_acc,
-melody,
-chords)
-VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+FilePath)
+VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 """
-		self.cur.executemany(query, rows)
+		feature_query = """
+INSERT INTO features (
+	ID, 
+	FilePath
+) 
+VALUES (?, ?)
+"""
+
+		self.cur.executemany(info_query, info_rows)
+		self.cur.executemany(feature_query, feature_rows)
 		open_csv.close()
 
 	def load_Music_by_ID(self, ID=0):
@@ -455,7 +462,7 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		output Music: loaded music
 		"""
 		music = Music()
-		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music where ID = ?;"
+		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features where ID = ?;"
 		self.cur.execute(query, (ID,))
 		music.load_database(self.cur.fetchone())
 		return music
@@ -463,7 +470,7 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		"""
 		output int: database size
 		"""
-		query = "select count(*) from music;"
+		query = "select count(*) from features;"
 		self.cur.execute(query)
 		return self.cur.fetchone()[0]
 	def insert_db(self, music):
@@ -471,14 +478,14 @@ VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		input:
 			music Music: music data to insert
 		"""
-		query = "INSERT INTO music("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
+		query = "INSERT INTO features ("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
 		self.cur.execute(query, music.to_list())
 	def getIDlist(self):
-		query = "select ID from music;"
+		query = "select ID from features;"
 		self.cur.execute(query)
 		return list(map(lambda x:x[0], self.cur.fetchall()))
 	def loadAllMusic(self):
-		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from music;"
+		query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features;"
 		self.cur.execute(query)
 		output_list = self.cur.fetchall()
 		music_list = []
