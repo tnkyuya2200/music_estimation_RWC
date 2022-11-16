@@ -1,4 +1,5 @@
 *.wav
+*.wav.analyzed
 *.db
 *.bat
 *.json

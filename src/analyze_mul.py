@@ -14,7 +14,7 @@ def main():
 	db = fn.Database(sys.argv[1])
 	IDs = db.getIDlist()
 	query = """
-	UPDATE music SET y = ?, sr = ?, beats = ?, bpm = ?, frame_size = ?, quantize = ?, melody = ?, chords = ?
+	UPDATE features SET y = ?, sr = ?, beats = ?, bpm = ?, frame_size = ?, quantize = ?, melody = ?, chords = ?
 		where ID == ?;
 	"""
 	with ProcessPoolExecutor(max_workers=8) as executor:
