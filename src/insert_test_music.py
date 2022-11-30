@@ -6,7 +6,7 @@ def main():
 	m = fn.Music()
 	m.load_music(sys.argv[2])
 	query = """
-UPDATE music SET FilePath = ? where ID == ?;
+UPDATE features SET FilePath = ? where ID == ?;
 """
 	data = (m.FilePath, m.ID)
 	db.cur.execute(query, data)
