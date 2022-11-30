@@ -5,6 +5,7 @@ from tqdm import tqdm
 # from spleeter.separator import Separator
 from collections import OrderedDict
 import sqlite3
+import mysql.connector
 import io
 import copy
 import os
@@ -359,6 +360,9 @@ def compare_all(test_music, db):
             result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
     return result
 
+class DatabaseError(Exception):
+    pass
+
 class Database:
     Path = None
     con = None
@@ -368,21 +372,28 @@ class Database:
         input:
             Path str: FilePath to database
         """
-        sqlite3.register_adapter(np.ndarray, adapt_array)
-        sqlite3.register_converter("array", convert_array)
+        self.con = mysql.connector.connect(
+            user="root",
+            host="localhost",
+            database="python_db",
+            unix_socket="/data/mysql/mysql.sock"
+        )
+        if not self.con.is_connected:
+            raise DatabaseError("Error connect database")
+            return
         self.Path = Path
-        self.con = sqlite3.connect(Path, detect_types=sqlite3.PARSE_DECLTYPES)
-        self.cur = self.con.cursor()
-        self.con.isolation_level = None
+        self.cur = self.con.curosr()
+
     def __del__(self):
+        self.cur.close()
         self.con.close()
     def init_database(self, csv_Path="Data_light.csv"):
-        self.con.execute("DROP TABLE IF EXISTS info;")
-        self.con.execute("DROP TABLE IF EXISTS features;")
+        self.con.execute("DROP TABLE IF EXISTS info")
+        self.con.execute("DROP TABLE IF EXISTS features")
         info_query = """
 CREATE TABLE IF NOT EXISTS info(
-    ID INTEGER PRIMARY KEY,
-    NO INTEGER,
+    ID INT NOT NULL PRIMARY KEY,
+    NO INT,
     Composer TEXT,
     Composer_Eng TEXT,
     Artist TEXT,
@@ -396,27 +407,27 @@ CREATE TABLE IF NOT EXISTS info(
     Sub_Genre TEXT,
     Sub_Genre_ENG TEXT,
     FilePath TEXT
-);
+)
         """
         feature_query = """
 CREATE TABLE IF NOT EXISTS features(
     ID INTEGER PRIMARY KEY,
     FilePath TEXT,
-    y ARRAY,
+    y JSON,
     sr INTEGER,
-    beats ARRAY,
+    beats JSON,
     bpm INTEGER,
     frame_size INTEGER,
     quantize INTEGER,
-    esti_vocals ARRAY,
-    esti_acc ARRAY,
-    melody ARRAY,
-    chords ARRAY
-);
+    esti_vocals JSON,
+    esti_acc JSON,
+    melody JSON,
+    chords JSON
+)
         """
         self.con.execute(info_query)
         self.con.execute(feature_query)
-        self.con.execute("INSERT INTO features (ID) VALUES (0);")
+        self.con.execute("INSERT INTO features (ID) VALUES (0)")
         open_csv = open(csv_Path, encoding="utf-8")
         read_csv = csv.reader(open_csv)
 
@@ -427,35 +438,39 @@ CREATE TABLE IF NOT EXISTS features(
             feature_rows.append([row[0], row[14]])
         info_query = """
 INSERT INTO info (
-ID,
-NO,
-Composer,
-Composer_Eng,
-Artist,
-Artist_Eng,
-Title,
-Title_Eng,
-CD,
-Track_No,
-Genre,
-Genre_Eng,
-Sub_Genre,
-Sub_Genre_ENG,
-FilePath)
-VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    ID,
+    NO,
+    Composer,
+    Composer_Eng,
+    Artist,
+    Artist_Eng,
+    Title,
+    Title_Eng,
+    CD,
+    Track_No,
+    Genre,
+    Genre_Eng,
+    Sub_Genre,
+    Sub_Genre_ENG,
+    FilePath
+) 
+VALUES (
+    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+)
+
 """
         feature_query = """
 INSERT INTO features (
     ID, 
     FilePath
 ) 
-VALUES (?, ?)
+VALUES (%s, %s)
 """
-
         self.cur.executemany(info_query, info_rows)
         self.cur.executemany(feature_query, feature_rows)
         open_csv.close()
-
+        self.con.commit()
+        
     def load_Music_by_ID(self, ID=0):
         """
         input:
@@ -463,7 +478,11 @@ VALUES (?, ?)
         output Music: loaded music
         """
         music = Music()
-        query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features where ID = ?;"
+        query = """
+SELECT ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords 
+FROM features 
+WHERE ID = %s
+        """
         self.cur.execute(query, (ID,))
         music.load_database(self.cur.fetchone())
         return music
@@ -471,7 +490,7 @@ VALUES (?, ?)
         """
         output int: database size
         """
-        query = "select count(*) from features;"
+        query = "SELECT count(*) FROM features"
         self.cur.execute(query)
         return self.cur.fetchone()[0]
     def insert_db(self, music):
@@ -479,14 +498,21 @@ VALUES (?, ?)
         input:
             music Music: music data to insert
         """
-        query = "INSERT INTO features ("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
+        query = """
+INSERT INTO features (""" + music.schema() + """) 
+VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
         self.cur.execute(query, music.to_list())
     def getIDlist(self):
-        query = "select ID from features;"
+        query = "SELECT ID FROM features"
         self.cur.execute(query)
         return list(map(lambda x:x[0], self.cur.fetchall()))
     def loadAllMusic(self):
-        query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features;"
+        music = Music()
+        query = """
+SELECT """ + music.schema() + """ ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords 
+FROM features
+        """
         self.cur.execute(query)
         output_list = self.cur.fetchall()
         music_list = []
