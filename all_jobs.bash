@@ -6,7 +6,6 @@
 # $4 - result dir
 
 rm $1
-rm $3 -r
 rm $4/*
 
 bash init_database.bash $1 $2
