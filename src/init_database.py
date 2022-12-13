@@ -1,3 +1,3 @@
 import myfunctions as fn
 import sys
-db = fn.Database(sys.argv[1]).init_database(sys.argv[2])
+db = fn.Database().init_database(sys.argv[1])

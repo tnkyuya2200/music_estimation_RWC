@@ -1,14 +1,13 @@
 #!/bin/bash -eu
 
-# $1: database file
-# $2: test data dir
-# $3: result data dir
+# $1: test data dir
+# $2: result data dir
 
-mkdir -p $3
-for file in $2/*.wav; do
-	python src/insert_test_music.py $1 $file
-	python src/separate_single.py $1 0
-	python src/music_estimation.py $1 $file $3
+mkdir -p $2
+for file in $1/*.wav; do
+	python src/insert_test_music.py $file
+	python src/separate_single.py 0
+	python src/music_estimation.py $file $2
 	echo estimated $file
 	mv $file $file.analyzed
 done
