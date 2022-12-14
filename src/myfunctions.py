@@ -159,11 +159,14 @@ def compare_melody(input_melody, database_melody):
     output float64: simirality score
     """
     sim = []
-    for index_db in range(len(database_melody)):
-        db_sample = database_melody[index_db]
+    input_melody_nan = none_to_nan(input_melody)
+    database_melody_nan = none_to_nan(database_melody)
+    
+    for index_db in range(len(database_melody_nan)):
+        db_sample = database_melody_nan[index_db]
         sim_db = [0]
-        for index_input in range(len(input_melody)):
-            input_sample = input_melody[index_input]
+        for index_input in range(len(input_melody_nan)):
+            input_sample = input_melody_nan[index_input]
             sim_lag = [0]
             if len(input_sample) > len(db_sample):
                 for lag in range(len(input_sample)-len(db_sample)+1):
@@ -259,7 +262,7 @@ def compare(input_music, database_music):
     sim_melody = compare_melody(input_music.melody, database_music.melody)
     #sim_acc = compare_acc(input.acc, data.acc)
     sim_chords = compare_acc(input_music.chords, database_music.chords)
-    return sim_melody,  sim_chords
+    return sim_melody, sim_chords
 
 # def spleeter_4stems_separate(y, sep=20000000):
 #     """
@@ -317,7 +320,7 @@ def f0_in_beats(vocals, beats, sr, quantize=8):
     for index in range(len(q_beats)-1):
         note = np.median(f0[q_beats[index]:q_beats[index+1]])
         if np.median(np.abs(mono_vocals[q_beats[index]*512:q_beats[index+1]*512])) < threshold or note >= 80 :
-            output.append(np.nan)
+            output.append(None)
         else:
             output.append(note)
     return np.array(output)
@@ -360,23 +363,24 @@ def compare_all(test_music, db):
             result[ID]["sim"]["average"] = np.mean((vocal_sim, chords_sim))
     return result
 
-def sql_conv_w(data):
-    for group in tmp_list:
-        for frame in group:
+def nan_to_none(data):
+    result = copy.deepcopy(data)
+    for group in result:
+        for idx, frame in enumerate(group):
             if np.isnan(frame):
-                frame = "nan"
-        
-    return json.dumps(data.toarray())
+                group[idx] = None
+    return result
 
-def sql_conv_r(data):
+def none_to_nan(data):
     if data is None:
         return None
-    tmp_list = np.array(json.loads(data))
-    for group in tmp_list:
-        for frame in group:
-            if frame == "nan":
-                frame = np.nan
-    return tmp_list
+    result = copy.deepcopy(data)
+    for group in result:
+        for idx, frame in enumerate(group):
+            if frame is None:
+                group[idx] = np.nan
+    return result
+
 
 class Database:
     con = None
@@ -401,7 +405,9 @@ class Database:
     def init_database(self, csv_Path):
         self.cur = self.con.cursor()
         self.cur.execute("""
-        DROP TABLE IF EXISTS info, features, y, beats, e_vocals, e_acc, melody, chords;
+        DROP TABLE IF EXISTS 
+            info, features, y, beats, 
+            e_vocals, e_acc, melody, chords;
         """)
         self.cur.execute("""
 CREATE TABLE info(
@@ -437,14 +443,17 @@ CREATE TABLE y(
     ID INTEGER,
     idx1 INTEGER,
     idx2 INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx1, idx2)
 )
         """)
         self.cur.execute("""
 CREATE TABLE beats(
     ID INTEGER ,
     idx INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx)
+
 )
         """)
         self.cur.execute("""
@@ -452,7 +461,8 @@ CREATE TABLE e_vocals(
     ID INTEGER,
     idx1 INTEGER,
     idx2 INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx1, idx2)
 )
         """)
         self.cur.execute("""
@@ -460,7 +470,8 @@ CREATE TABLE e_acc(
     ID INTEGER,
     idx1 INTEGER,
     idx2 INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx1, idx2)
 )
         """)
         self.cur.execute("""
@@ -468,7 +479,8 @@ CREATE TABLE melody(
     ID INTEGER,
     idx1 INTEGER,
     idx2 INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx1, idx2)
 )
         """)
         self.cur.execute("""
@@ -476,7 +488,8 @@ CREATE TABLE chords(
     ID INTEGER,
     idx1 INTEGER,
     idx2 INTEGER,
-    data FLOAT
+    data FLOAT,
+    PRIMARY KEY(ID, idx1, idx2)
 )
         """)
         self.cur.execute("INSERT INTO features (ID) VALUES (0)")
@@ -538,15 +551,112 @@ FROM features
 WHERE ID = %s
         """
         self.cur.execute(query, (ID,))
-        (music.ID, music.FilePath, music.sr, music.bpm, music.frame_size, music.quantize) = self.cur.fetchone()
+        (music.ID, music.FilePath, music.sr, music.bpm, 
+            music.frame_size, music.quantize) = self.cur.fetchone()
 
         #load y
-        load_datas = lambda table_name:
+        music.y = self.load_data("y")
+        music.beats = self.load_data("beats")
+        music.e_vocals = self.load_data("e_vocals")
+        music.e_acc = self.load_data("e_acc")
+        music.chords = self.load_data("chords")
+        music.melody = self.load_data("melody")
+        query = """
+SELECT data FROM beats WHERE ID = %s ORDER BY idx ASC;
+        """
+        music.beats = np.array(
+            [x[0] for x in self.cur.fetchone()], dtype="object"
+        )
+        self.cur.close()
+        return music
+
+    def getdbsize(self):
+        """
+        output int: database size
+        """
+        self.cur = self.con.cursor()
+        query = "SELECT count(*) FROM features"
+        self.cur.execute(query)
+        self.cur.close()
+        return self.cur.fetchone()[0]
+    def insert_db(self, music):
+        """
+        input:
+            music Music: music data to insert
+        """
+        query = """
+INSERT INTO features (
+    ID,
+    FilePath,
+    sr,
+    bpm,
+    frame_size,
+    quantize
+)
+VALUES(%s, %s, %s, %s, %s, %s)
+        """
+        self.cur.execute(
+            query, 
+            (music.ID, music.FilePath, music.sr, 
+            music.bpm, music.frame_size, music.quantize)
+        )
+        self.con.commit()
+        
+    def getIDlist(self):
+        self.cur = self.con.cursor()
+        query = "SELECT ID FROM features"
+        self.cur.execute(query)
+        self.cur.close()
+        return list(map(lambda x:x[0], self.cur.fetchall()))
+
+    def loadAllMusic(self):
+        IDlist = self.getIDlist()
+        music_list = list(map(load_Music_by_ID, IDlist))
+        return music_list
+
+    def insert_data(self, table_name, ID, data):
+        self.cur = self.con.cursor()
+        if table_name == "beats":
             query = """
-SELECT data FROM y WHERE ID = %s AND idx1 = %s ORDER BY idx2 ASC;
+INSERT INTO %s (
+    ID, idx, data
+)
+VALUES (%s, %s, %s)
             """
-            idx1 = 0;
-            self.cur.execute(query, (ID, idx1))
+            self.cur.executemany(
+                query, [("beats", idx, x) for idx, x in enumerate(data)]
+            )
+        else:
+            query = """
+INSERT INTO %s (
+    ID, idx1, idx2, data
+)
+VALUES (%s, %s, %s, %s)
+            """
+            for idx1, row in enumerate(data):
+                for idx2, value in enumerate(row):
+                    data.append((table_name, idx1, idx2, value))
+            self.cur.executemany(query, data)
+        # self.con.commit()
+        self.cur.close()
+
+    def load_data(self, ID, table_name):
+        self.cur = self.con.cursor()
+        if table_name == "beats":
+            query = """
+SELECT data FROM beats WHERE ID = %s ORDER BY idx ASC
+            """
+            self.cur.execute(query, (ID,))
+            data = np.array(
+                [x[0] for x in self.cur.fetchone()], 
+                dtype="object"
+            )
+        else:
+            query = """
+SELECT data FROM %s WHERE ID = %s AND idx1 = %s ORDER BY idx2 ASC
+        """
+            idx1 = 0
+            self.cur.execute(query, (table_name, ID, idx1))
             tmp_data = [x[0] for x in self.cur.fetchall()]
             data = []
             while len(data) != 0:
@@ -555,57 +665,17 @@ SELECT data FROM y WHERE ID = %s AND idx1 = %s ORDER BY idx2 ASC;
                 self.cur.execute(query, (ID, idx1))
                 tmp_data = [x[0] for x in self.cur.fetchall()]
             data = np.array(data, dtype="object")
-            return data
-        #load y
-
-        #load beats
-
-        #load e_vocals
-
-        #load e_acc
-
-        #load melody
-
-        #load chords
-
-        
-        return music
-    def getdbsize(self):
-        """
-        output int: database size
-        """
-        query = "SELECT count(*) FROM features"
-        self.cur.execute(query)
-        return self.cur.fetchone()[0]
-    def insert_db(self, music):
-        """
-        input:
-            music Music: music data to insert
-        """
+        self.cur.close()
+        return data
+    def delete_data(self, table_name, ID):
+        self.cur = self.con.cursor()
         query = """
-INSERT INTO features (""" + music.schema() + """) 
-VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+DELETE FROM %s WHERE ID = %s
         """
-        self.cur.execute(query, music.to_list())
-    def getIDlist(self):
-        query = "SELECT ID FROM features"
-        self.cur.execute(query)
-        return list(map(lambda x:x[0], self.cur.fetchall()))
-    def loadAllMusic(self):
-        music = Music()
-        query = """
-SELECT """ + music.schema() + """ 
-FROM features
-        """
-        self.cur.execute(query)
-        output_list = self.cur.fetchall()
-        music_list = []
-        for output in output_list:
-            music = Music()
-            music.load_database(output)
-            music_list.append(music)
-        return music_list
-        
+        self.cur.execute(query, (ID,))
+    def update_data(self, table_name, ID, data):
+        self.delete_data(table_name, ID)
+        self.insert_data(table_name, ID, data)
 class Music:
     ID = None           # Song ID                               int
     y = None            # wav series                            np.ndarray, shape=(2,samples)
@@ -615,23 +685,14 @@ class Music:
     bpm = 0             # beats per minute                      int
     frame_size = 512    # frame size (default 512 samples)      int
     quantize = 4        # how often you get melody notes        int
-    esti_vocals = None  # estimated vocals                      np.ndarray, shape=(2,samples)
-    esti_acc = None     # estimated acc                         np.ndarray, shape=(2,samples)
+    e_vocals = None     # estimated vocals                      np.ndarray, shape=(2,samples)
+    e_acc = None        # estimated acc                         np.ndarray, shape=(2,samples)
     melody = None       # analyzed cqt_bins in each beats       np.ndarray, shape=(len(beats),)
     chords = None       # analyzed chords                       np.ndarray, shape=(12,len(beats))
 
     def load_music(self, FilePath):
         self.ID = 0
         self.FilePath = FilePath
-    def load_database(self, data):
-        (self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
-        self.esti_vocals, self.esti_acc, self.melody, self.chords) = tuple(data)
-        self.y = np.array(self.y)
-        self.beats = sql_conv_r(self.beats)
-        self.esti_vocals = sql_conv_r(self.esti_vocals)
-        self.esti_acc = sql_conv_r(self.esti_acc)
-        self.melody = sql_conv_r(self.melody)
-        self.chords = sql_conv_r(self.chords)
     def load_and_analyze_music(self, quantize=4):
         self.y, self.sr = librosa.load(self.FilePath, mono=False)
         self.y = librosa.util.normalize(self.y, axis=1)
@@ -639,20 +700,20 @@ class Music:
     def analyze_music(self, quantize=4):
         self.quantize = int(quantize)
         self.bpm, self.beats = librosa.beat.beat_track(y=librosa.to_mono(self.y), sr=self.sr)
-        vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)
+        vocals_f0 = f0_in_beats(self.e_vocals, self.beats, self.sr)
         self.sep_beats(self.quantize)
         self.melody = sep_count(vocals_f0)
-        self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
+        self.chords = estimate_chords(chroma_in_beats(self.e_acc, self.sr, self.beats))
     # def separate_music(self):
-    #     self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
+    #     self.e_vocals, self.e_acc = spleeter_4stems_separate(self.y)
     def sep_beats(self, quantize):
         self.beats = sep_quantize(self.beats, quantize)
         self.bpm = self.bpm * quantize/4
     def to_list(self):
         return (self.ID, sql_conv_w(self.y), self.FilePath, self.sr, sql_conv_w(self.beats), self.bpm, self.frame_size,
-            self.quantize, sql_conv_w(self.esti_vocals), sql_conv_w(self.esti_acc), sql_conv_w(self.melody), sql_conv_w(self.chords))
+            self.quantize, sql_conv_w(self.e_vocals), sql_conv_w(self.e_acc), sql_conv_w(self.melody), sql_conv_w(self.chords))
     def schema(self):
-        return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords"
+        return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, e_vocals, e_acc, melody, chords"
     def cqt_AF(self):
         y_cqt = librosa.cqt(librosa.to_mono(m.y))
         frame_result = np.ndarray((y_cqt.shape[0]-1, y_cqt.shape[1]), dtype='bool')

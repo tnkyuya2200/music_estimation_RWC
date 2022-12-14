@@ -18,19 +18,19 @@ CD_Number, Track Number, Genre(Japanese), Genre(English), Sub Genre(Japanese), S
 Music ID and FilePath must not be blank, but you can enter blank to the others.
 
 Then execute the following command:
-$ bash init_database.bash [database file] [csv file]
+$ bash init_database.bash [csv file]
 
-This initializes database [database file] with [csv file]
+This initializes the database with [csv file]
 
 3. Analyze the music
 
 	Execute the following command:
-	$ bash separate_all_ID.bash [database file]
-		This command separates music in the [database file].
+	$ bash separate_all_ID.bash 
+		This command separates music in the database.
 		Results are stored in the database.
 
-	$ bash analyze_all_ID.bash	[database file]
-		This command analyzes all music in the [database file].
+	$ bash analyze_all_ID.bash
+		This command analyzes all music in the database file.
 		Results are stored in the database.
 
 	Notice You have to do the job in the order.
@@ -39,9 +39,9 @@ This initializes database [database file] with [csv file]
 
 	4.1 Prepare test data with the command
 	Execute the following command:
-	$	bash make_testdata_all_ID.bash [database file] [output directory]
+	$	bash make_testdata_all_ID.bash [output directory]
 
-	This makes test data for all songs in [database file] and outputs to [output directory]
+	This makes test data for all songs in the database and outputs to [output directory]
 	It creates five types of test data.
 	- raw: The music itself in the database
 	- noise: The music with noise
@@ -57,12 +57,12 @@ This initializes database [database file] with [csv file]
 5. Recognize Music
 
 	Execute the following command:
-	$ bash music_estimation.bash [database file] [directory name] [output dir]
-	This command recognizes music in [directory name] using the [database file] and outputs results in [output dir].
+	$ bash music_estimation.bash [directory name] [output dir]
+	This command recognizes music in [directory name] using the database and outputs results in [output dir].
 	Once analyzed, the file name of the test data changes from ".wav" to ".wav.analyzed", so if you re-execute, the command ignores the already analyzed file.
 	Rename the file ".wav.analyzed" to ".wav" to re-analyze.
 
-	The result is a JSON file with following format:
+	The result is a JSON file with the following format:
 	- "test_file" text: the file name of the test data
 	- "db" list: a list of each score of the database music
 		- "ID" int: database song ID
@@ -74,7 +74,7 @@ This initializes database [database file] with [csv file]
 
 
 The following command executes all the jobs.
-$ bash all_jobs.bash [database file] [csv file] [test data dir] [output dir]
+$ bash all_jobs.bash  [csv file] [test data dir] [output dir]
 
 6. Recognition rate
 	You can see the recognition rate in the following command:
