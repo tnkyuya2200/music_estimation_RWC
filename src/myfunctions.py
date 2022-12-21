@@ -10,6 +10,7 @@ import copy
 import os
 import csv
 import warnings
+from bitarray import bitarray
 
 def make_chorddict():
     chord_dic = OrderedDict()
@@ -410,7 +411,8 @@ CREATE TABLE IF NOT EXISTS features(
     esti_vocals ARRAY,
     esti_acc ARRAY,
     melody ARRAY,
-    chords ARRAY
+    chords ARRAY,
+    fingerprint ARRAY
 );
         """
         self.con.execute(info_query)
@@ -462,7 +464,7 @@ VALUES (?, ?)
         output Music: loaded music
         """
         music = Music()
-        query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features where ID = ?;"
+        query = "select " + music.schema() + " from features where ID = ?;"
         self.cur.execute(query, (ID,))
         music.load_database(self.cur.fetchone())
         return music
@@ -485,7 +487,7 @@ VALUES (?, ?)
         self.cur.execute(query)
         return list(map(lambda x:x[0], self.cur.fetchall()))
     def loadAllMusic(self):
-        query = "select ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords from features;"
+        query = "select " + Music.schema() + " from features;"
         self.cur.execute(query)
         output_list = self.cur.fetchall()
         music_list = []
@@ -507,14 +509,15 @@ class Music:
     esti_vocals = None  # estimated vocals                      np.ndarray, shape=(2,samples)
     esti_acc = None     # estimated acc                         np.ndarray, shape=(2,samples)
     melody = None       # analyzed cqt_bins in each beats       np.ndarray, shape=(len(beats),)
-    chords = None       # analyzed chords                       np.ndarray, shape=(12,len(beats))
+    chords = None       # analyzed chords                       np.ndarray, shape=(12, len(beats))
+    fingerprint = None  # fingerprint                           np.ndarray, shape=(len(beats), 83(nbin))
 
     def load_music(self, FilePath):
         self.ID = 0
         self.FilePath = FilePath
     def load_database(self, data):
         (self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size, self.quantize,
-        self.esti_vocals, self.esti_acc, self.melody, self.chords) = tuple(data)
+        self.esti_vocals, self.esti_acc, self.melody, self.chords, self.fingerprint) = tuple(data)
     def load_and_analyze_music(self, quantize=4):
         self.y, self.sr = librosa.load(self.FilePath, mono=False)
         self.y = librosa.util.normalize(self.y, axis=1)
@@ -533,28 +536,17 @@ class Music:
         self.bpm = self.bpm * quantize/4
     def to_list(self):
         return (self.ID, self.y, self.FilePath, self.sr, self.beats, self.bpm, self.frame_size,
-            self.quantize, self.esti_vocals, self.esti_acc, self.melody, self.chords)
+            self.quantize, self.esti_vocals, self.esti_acc, self.melody, self.chords, self.fingerprint)
     def schema(self):
-        return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords"
-    def cqt_AF(self):
-        y_cqt = librosa.cqt(librosa.to_mono(m.y))
-        frame_result = np.ndarray((y_cqt.shape[0]-1, y_cqt.shape[1]), dtype='bool')
-        result = np.ndarray((y_cqt.shape[1]), dtype='int32')
-        for frame in range(y_cqt.shape[1]-1):
-            for nbin in range(y_cqt.shape[0]-1):
-                frame_result[nbin, frame] = \
-                    y_cqt[nbin][frame+1] - y_cqt[nbin+1][frame+1] -\
-                        y_cqt[nbin][frame] + y_cqt[nbin+1][frame] > 0
-                result.append(frame_result)
-        return result
+        return "ID, y, FilePath, sr, beats, bpm, frame_size, quantize, esti_vocals, esti_acc, melody, chords, fingerprint"
     def cqt_beat_AF(self):
-        y_cqt = librosa.cqt(librosa.to_mono(m.y))
-        frame_result = np.ndarray((y_cqt.shape[0]-1, y_cqt.shape[1]), dtype='bool')
-        result = np.ndarray((y_cqt.shape[1]), dtype='int32')
-        for n_beat in range(len(self.beats)-2):
-            for n_bin in range(y_cqt.shape[0]-1):
-                beat_result[n_bin, n_beat] = \
-                    conv_stft(n_bin, n_beat+1) - conv_stft(n_bin+1, n_beat+1) -\
-                        conv_stft(n_bin, n_beat) + conv_stft(n_bin+1, n_beat) > 0
-                result.append(beat_result)
-        return result
+        nbin_beat_sum = lambda nbin, beat: np.sum(y_cqt[nbin][beat:beat+1])
+        y_cqt = librosa.cqt(librosa.to_mono(self.y))
+        result = np.ndarray((len(m.beats[:-2])), dtype='object')
+        for beat_idx, beat in enumerate(m.beats[:-2]):
+            beat_result = bitarray(y_cqt.shape[0]-1)
+            for nbin in range(y_cqt.shape[0]-1):
+                beat_result[nbin] = \
+                    nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
+                        - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat) > 0
+        self.fingerprint = result
