@@ -9,10 +9,10 @@ $ conda activate py38_ME
 
 2. Prepare database
 
-Make a no header CSV file with the following format
+Make a no-header CSV file with the following format
 
-One line represents one music, and consists of following:
-Music ID(must be unique), No., Composer(Japanese), Composer(English), Artist(Japanese), Artist(English), Title(Japnaese), Title(English), 
+One line represents one song, and consists of the following:
+Music ID(must be unique), No., Composer(Japanese), Composer(English), Artist(Japanese), Artist(English), Title(Japanese), Title(English), 
 CD_Number, Track Number, Genre(Japanese), Genre(English), Sub Genre(Japanese), Sub Genre(English), FilePath
 
 Music ID and FilePath must not be blank, but you can enter blank to the others.
@@ -22,10 +22,22 @@ $ bash init_database.bash [database file] [csv file]
 
 This initializes database [database file] with [csv file]
 
+3. Analyze the music
 
-3. Prepare test data
+	Execute the following command:
+	$ bash separate_all_ID.bash [database file]
+		This command separates music in the [database file].
+		Results are stored in the database.
 
-	3.1 Prepare test data with command
+	$ bash analyze_all_ID.bash	[database file]
+		This command analyzes all music in the [database file].
+		Results are stored in the database.
+
+	Notice You have to do the job in the order.
+
+4. Prepare test data
+
+	4.1 Prepare test data with the command
 	Execute the following command:
 	$	bash make_testdata_all_ID.bash [database file] [output directory]
 
@@ -37,33 +49,21 @@ This initializes database [database file] with [csv file]
 	- speed: The speed of music changed between ×0.50 to ×1.50 (excludes ×1)
 	- snipped: The snipped music lasts 1 minute to whichever shorter 180 seconds or 0.8 times the length of the music
 
-	3.2 Prepare test data with your own
+	4.2 Prepare test data with your own
 	You may prepare the test data on your own.
 	Put the song in a directory.
 
-4. Analyze the music
-
-	Execute the following command:
-	$ bash separate.bash [database file]
-		This command separates music in the [database file].
-		Results are stored in the database.
-
-	$ bash analyze_all_ID.bash	[database file]
-		This command analyzes all music in the [database file].
-		Results are stored in the database.
-	
-	Notice that you have to execute commands in this order.
 
 5. Recognize Music
 
 	Execute the following command:
 	$ bash music_estimation.bash [database file] [directory name] [output dir]
 	This command recognizes music in [directory name] using the [database file] and outputs results in [output dir].
-	Once analyzed, the file name of the test data changes from ".wav" to ".wav.analyzed", so ir you re-execute, the command ignores the already analyzed file.
+	Once analyzed, the file name of the test data changes from ".wav" to ".wav.analyzed", so if you re-execute, the command ignores the already analyzed file.
 	Rename the file ".wav.analyzed" to ".wav" to re-analyze.
 
 	The result is a JSON file with following format:
-	- "test_file" text: file name of the test data
+	- "test_file" text: the file name of the test data
 	- "db" list: a list of each score of the database music
 		- "ID" int: database song ID
 		- "sim" dict: similarity scores
@@ -73,7 +73,7 @@ This initializes database [database file] with [csv file]
 
 
 
-The following command executes all the job.
+The following command executes all the jobs.
 $ bash all_jobs.bash [database file] [csv file] [test data dir] [output dir]
 
 6. Recognition rate

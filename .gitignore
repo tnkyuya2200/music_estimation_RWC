@@ -1,7 +1,14 @@
 *.wav
+*.wav.analyzed
 *.db
 *.bat
 *.json
+RWC
+data
+database
+database/
+testdata/
+result
 screenlog.*
 pretrained_models/
 __pycache__/
@@ -9,3 +16,5 @@ __pycache__/
 checkpoint
 model*
 pitch_estimation/result
+IDlist.txt
+
