@@ -27,7 +27,6 @@ for frame in range(y_cqt.shape[1]-1):
     print()
 print(f"size: ({y_cqt.shape[0]-1}, {y_cqt.shape[1]-1})")
 """
-frame_result = np.ndarray((len(m.beats[:-2]), y_cqt.shape[1]), dtype='bool')
 result = np.ndarray((len(m.beats[:-2])), dtype='object')
 for beat_idx, beat in enumerate(m.beats[:-2]):
     beat_result = bitarray(y_cqt.shape[0]-1)

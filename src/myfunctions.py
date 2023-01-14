@@ -246,6 +246,40 @@ def compare_acc(acc1, acc2, separate=64):
         sim_i.append(np.mean(sim))
     return max(sim_i)
 
+def compare_fp(fp1, fp2):
+    """
+    input:
+        fp1 np.ndarray, shape=(len(beats), 83(nbin))
+        fp2 np.ndarray, shape=(len(beats), 83(nbin))
+    output float64: simirality of fp1, fp2
+    """
+
+    def BER(s1, s2):
+        result = 0
+        for i in range(s1.shape[0]):
+            for j in range(s1.shape[1]):
+                result += s1[i,j] == s2[i,j]
+        return result
+
+    separate = 64
+    shorter_fp = fp1
+    longer_fp = fp2
+    if fp1.shape[0] > fp2.shape[0]:
+        shorter_fp = fp2
+        longer_fp = fp1
+    sim_i = []
+    for i in range(12):
+        rolled_shorter_fp = shorter_fp[:, i:-(12-i)]
+        sim_idx = [0]
+        for shorter_idx in range(shorter_fp.shape[0]//separate):
+            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[1]-1), :]
+            for longer_idx in range(longer_acc.shape[0]-separate):
+                longer_sample = longer_acc[longer_idx:longer_idx+separate, :]
+                sim_idx.append(BER(shorter_sample, longer_sample))
+            sim.append(max(sim_idx))
+        sim_i.append(np.mean(sim))
+    return max(sim_i)
+
 def compare(input_music, database_music):
     """
     input:
@@ -480,7 +514,7 @@ VALUES (?, ?)
         input:
             music Music: music data to insert
         """
-        query = "INSERT INTO features ("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"
+        query = "INSERT INTO features ("+ music.schema() +") VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);"
         self.cur.execute(query, music.to_list())
     def getIDlist(self):
         query = "select ID from features;"
@@ -529,6 +563,7 @@ class Music:
         self.sep_beats(self.quantize)
         self.melody = sep_count(vocals_f0)
         self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
+        self.fingerprint = self.cqt_beat_AF()
     # def separate_music(self):
     #     self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
     def sep_beats(self, quantize):
@@ -549,4 +584,4 @@ class Music:
                 beat_result[nbin] = \
                     nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
                         - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat) > 0
-        self.fingerprint = result
+        return result
