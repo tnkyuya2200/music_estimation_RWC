@@ -1,9 +1,7 @@
 import myfunctions as fn
-from tqdm import tqdm
 import sys
 from logging import StreamHandler, Formatter, INFO, getLogger
 from concurrent.futures import ProcessPoolExecutor
-from tqdm import tqdm
 
 db = fn.Database("music.db")
 query = """
@@ -23,7 +21,7 @@ def task(ID):
 def main():
     db = fn.Database(sys.argv[1])
     IDs = db.getIDlist()
-    with ProcessPoolExecutor(max_workers=8) as executor:
+    with ProcessPoolExecutor() as executor:
         futures = []
         for ID in IDs[1:]:
             future = executor.submit(

@@ -282,6 +282,35 @@ def compare_fp(fp1, fp2):
         sim_i.append(np.mean(sim))
     return max(sim_i)
 
+def compare_fp_chroma(fp1, fp2):
+    def BER(s1, s2):
+        if s1.shape[0] == 0:
+            return 0
+        result = 0
+        for i in range(s1.shape[0]):
+            result += np.mean(~(s1[i,:] ^ s2[i,:-12]))
+        return result/s1.shape[0]
+
+    separate = 32
+    shorter_fp = fp1
+    longer_fp = fp2
+    if fp1.shape[0] > fp2.shape[0]:
+        shorter_fp = fp2
+        longer_fp = fp1
+    sim_i = []
+    for i in range(12):
+        rolled_shorter_fp = np.roll(shorter_fp, i, axis=0)
+        sim = []
+        for shorter_idx in range(shorter_fp.shape[0]//separate):
+            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[1]-1), :]
+            sim_idx = [0]
+            for longer_idx in range(longer_fp.shape[0]-separate):
+                longer_sample = longer_fp[longer_idx:longer_idx+separate, :]
+                sim_idx.append(BER(shorter_sample, longer_sample))
+            sim.append(max(sim_idx))
+        sim_i.append(np.mean(sim))
+    return max(sim_i)
+
 def compare(input_music, database_music):
     """
     input:
@@ -567,6 +596,7 @@ class Music:
         self.melody = sep_count(vocals_f0)
         #self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
         self.fingerprint = self.cqt_beat_AF()
+        print(self.fingerprint.shape)
     # def separate_music(self):
     #     self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
     def sep_beats(self, quantize):
@@ -584,6 +614,18 @@ class Music:
         for beat_idx, beat in enumerate(self.beats[:-2]):
             beat_result = np.empty(y_cqt.shape[0]-1, dtype=bool)
             for nbin in range(y_cqt.shape[0]-1):
+                tmp = nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
+                        - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat)
+                beat_result[nbin] = tmp > 0
+            result.append(beat_result)
+        return np.array(result)
+    def chroma_beat_AF(self):
+        nbin_beat_sum = lambda nbin, beat: np.sum(y_chroma[nbin][beat:beat+1])
+        y_chroma = librosa.feature.chroma_stft(librosa.to_mono(self.y))
+        result = []
+        for beat_idx, beat in enumerate(self.beats[:-2]):
+            beat_result = np.empty(y_chroma.shape[0]-1, dtype=bool)
+            for nbin in range(y_chroma.shape[0]-1):
                 tmp = nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
                         - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat)
                 beat_result[nbin] = tmp > 0
