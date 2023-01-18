@@ -14,33 +14,32 @@ from bitarray import bitarray
 
 def make_chorddict():
     chord_dic = OrderedDict()
-    one_third = 1.0/3
     #major chords
-    chord_dic["C"] = [one_third, 0,0,0, one_third, 0,0, one_third, 0,0,0,0]
-    chord_dic["Db"] = [0, one_third, 0,0,0, one_third, 0,0, one_third, 0,0,0]
-    chord_dic["D"] = [0,0, one_third, 0,0,0, one_third, 0,0, one_third, 0,0]
-    chord_dic["Eb"] = [0,0,0, one_third, 0,0,0, one_third, 0,0, one_third, 0]
-    chord_dic["E"] = [0,0,0,0, one_third, 0,0,0, one_third, 0,0, one_third]
-    chord_dic["F"] = [one_third, 0,0,0,0, one_third, 0,0,0, one_third, 0,0]
-    chord_dic["Gb"] = [0, one_third, 0,0,0,0, one_third, 0,0,0, one_third, 0]
-    chord_dic["G"] = [0,0, one_third, 0,0,0,0, one_third, 0,0,0, one_third]
-    chord_dic["Ab"] = [one_third, 0,0, one_third, 0,0,0,0, one_third, 0,0,0]
-    chord_dic["A"] = [0, one_third, 0,0, one_third, 0,0,0,0, one_third, 0,0]
-    chord_dic["Bb"] = [0,0, one_third, 0,0, one_third, 0,0,0,0, one_third, 0]
-    chord_dic["B"] = [0,0,0, one_third, 0,0, one_third, 0,0,0,0, one_third]
+    chord_dic["C"] = [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+    chord_dic["Db"] = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]
+    chord_dic["D"] = [0,0, 1, 0,0,0, 1, 0,0, 1, 0,0]
+    chord_dic["Eb"] = [0,0,0, 1, 0,0,0, 1, 0,0, 1, 0]
+    chord_dic["E"] = [0,0,0,0, 1, 0,0,0, 1, 0,0, 1]
+    chord_dic["F"] = [1, 0,0,0,0, 1, 0,0,0, 1, 0,0]
+    chord_dic["Gb"] = [0, 1, 0,0,0,0, 1, 0,0,0, 1, 0]
+    chord_dic["G"] = [0,0, 1, 0,0,0,0, 1, 0,0,0, 1]
+    chord_dic["Ab"] = [1, 0,0, 1, 0,0,0,0, 1, 0,0,0]
+    chord_dic["A"] = [0, 1, 0,0, 1, 0,0,0,0, 1, 0,0]
+    chord_dic["Bb"] = [0,0, 1, 0,0, 1, 0,0,0,0, 1, 0]
+    chord_dic["B"] = [0,0,0, 1, 0,0, 1, 0,0,0,0, 1]
     #minor chords
-    chord_dic["Cm"] = [one_third, 0,0, one_third, 0,0,0, one_third, 0,0,0,0]
-    chord_dic["Dbm"] = [0, one_third, 0,0, one_third, 0,0,0, one_third, 0,0,0]
-    chord_dic["Dm"] = [0,0, one_third, 0,0, one_third, 0,0,0, one_third, 0,0]
-    chord_dic["Ebm"] = [0,0,0, one_third, 0,0, one_third, 0,0,0, one_third, 0]
-    chord_dic["Em"] = [0,0,0,0, one_third, 0,0, one_third, 0,0,0, one_third]
-    chord_dic["Fm"] = [one_third, 0,0,0,0, one_third, 0,0, one_third, 0,0,0]
-    chord_dic["Gbm"] = [0, one_third, 0,0,0,0, one_third, 0,0, one_third, 0,0]
-    chord_dic["Gm"] = [0,0, one_third, 0,0,0,0, one_third, 0,0, one_third, 0]
-    chord_dic["Abm"] = [0,0,0, one_third, 0,0,0,0, one_third, 0,0, one_third]
-    chord_dic["Am"] = [one_third, 0,0,0, one_third, 0,0,0,0, one_third, 0,0]
-    chord_dic["Bbm"] = [0, one_third, 0,0,0, one_third, 0,0,0,0, one_third, 0]
-    chord_dic["Bm"] = [0,0, one_third, 0,0,0, one_third, 0,0,0,0, one_third]
+    chord_dic["Cm"] = [1, 0,0, 1, 0,0,0, 1, 0,0,0,0]
+    chord_dic["Dbm"] = [0, 1, 0,0, 1, 0,0,0, 1, 0,0,0]
+    chord_dic["Dm"] = [0,0, 1, 0,0, 1, 0,0,0, 1, 0,0]
+    chord_dic["Ebm"] = [0,0,0, 1, 0,0, 1, 0,0,0, 1, 0]
+    chord_dic["Em"] = [0,0,0,0, 1, 0,0, 1, 0,0,0, 1]
+    chord_dic["Fm"] = [1, 0,0,0,0, 1, 0,0, 1, 0,0,0]
+    chord_dic["Gbm"] = [0, 1, 0,0,0,0, 1, 0,0, 1, 0,0]
+    chord_dic["Gm"] = [0,0, 1, 0,0,0,0, 1, 0,0, 1, 0]
+    chord_dic["Abm"] = [0,0,0, 1, 0,0,0,0, 1, 0,0, 1]
+    chord_dic["Am"] = [1, 0,0,0, 1, 0,0,0,0, 1, 0,0]
+    chord_dic["Bbm"] = [0, 1, 0,0,0, 1, 0,0,0,0, 1, 0]
+    chord_dic["Bm"] = [0,0, 1, 0,0,0, 1, 0,0,0,0, 1]
     return chord_dic
 
 chord_dic = make_chorddict()
@@ -53,7 +52,7 @@ def estimate_chord(chroma, chord_dic=chord_dic):
     output np.ndarray, shape=(12,): most similar chord vector
     """
     maximum = -1
-    this_chord = np.zeros(12)
+    this_chord = np.zeros(12, dtype=np.int8)
     for chord_index, (name, vector) in enumerate(chord_dic.items()):
         similarity = cos_sim(chroma, vector)
         if similarity > maximum:
@@ -201,7 +200,17 @@ def cos_sim(v1,v2):
         v2 array: vector
     output float64: cosine simirality of v1, v2
     """
+    if np.all(v1==0) or np.all(v2==0):
+        return 0
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+def BER(s1, s2):
+    if s1.shape[0] == 0:
+        return 0
+    result = 0
+    for i in range(min(s1.shape[0], s2.shape[0])):
+        result += np.mean(~(s1[i,:] ^ s2[i,:]))
+    return result/s1.shape[0]
 
 def corr_cossim(data1, data2):
     """
@@ -215,6 +224,17 @@ def corr_cossim(data1, data2):
     for i in range(min(data1.shape[1], data2.shape[1])):
         sim_i.append(cos_sim(data1[:,i], data2[:,i]))
     return np.mean(sim_i)
+
+def fp_cossim(data1, data2):
+    length = min(data1.shape[0], data2.shape[0])
+    #if length == 0:
+    #    return 0
+    sim_i = np.empty(length)
+    result = 0
+    for i in range(length):
+        result += cos_sim(data1[i, :].astype("int8"), data2[i, :].astype("int8"))
+    return result / length
+
 
 def compare_acc(acc1, acc2, separate=64):
     """
@@ -232,19 +252,20 @@ def compare_acc(acc1, acc2, separate=64):
     else:
         shorter_acc = acc1
         longer_acc = acc2
-    sim_i = []
+    sim_i = np.empty(12)
     for i in range(12):
         rolled_shorter_acc = np.roll(shorter_acc, i, axis=0)
-        sim = []
-        for index_shorter in range(shorter_acc.shape[1]//separate):
-            shorter_sample = rolled_shorter_acc[:,index_shorter*separate:min((index_shorter+1)*separate, shorter_acc.shape[1]-1)]
-            sim_index = [0]
-            for index_longer in range(longer_acc.shape[1]-separate):
-                longer_sample = longer_acc[:,index_longer:index_longer+separate]
-                sim_index.append(corr_cossim(shorter_sample, longer_sample))
-            sim.append(max(sim_index))
-        sim_i.append(np.mean(sim))
-    return max(sim_i)
+        sim = np.empty(shorter_acc.shape[1]//separate)
+        for shorter_idx in range(shorter_acc.shape[1]//separate):
+            shorter_sample = rolled_shorter_acc[:,shorter_idx*separate:min((shorter_idx+1)*separate, shorter_acc.shape[1]-1)]
+            sim_idx = np.empty(longer_acc.shape[1]-shorter_sample.shape[1]+1)
+            sim_idx[-1] = 0
+            for longer_idx in range(longer_acc.shape[1]-shorter_sample.shape[1]+1):
+                longer_sample = longer_acc[:,longer_idx:longer_idx+shorter_sample.shape[1]]
+                sim_idx[longer_idx] = corr_cossim(shorter_sample, longer_sample)
+            sim[shorter_idx] = np.max(sim_idx)
+        sim_i[i] = np.mean(sim)
+    return np.max(sim_i)
 
 def compare_fp(fp1, fp2):
     """
@@ -254,62 +275,61 @@ def compare_fp(fp1, fp2):
     output float64: simirality of fp1, fp2
     """
 
-    def BER(s1, s2):
-        if s1.shape[0] == 0:
-            return 0
-        result = 0
-        for i in range(s1.shape[0]):
-            result += np.mean(~(s1[i,:] ^ s2[i,:-12]))
-        return result/s1.shape[0]
-
     separate = 32
     shorter_fp = fp1
     longer_fp = fp2
     if fp1.shape[0] > fp2.shape[0]:
         shorter_fp = fp2
         longer_fp = fp1
-    sim_i = []
+    #sim_i = []
+    sim_i = np.empty(12)
     for i in range(12):
         rolled_shorter_fp = shorter_fp[:, i:-(12-i)]
-        sim = []
+        #sim = []
+        sim = np.empty(shorter_fp.shape[0]//separate)
         for shorter_idx in range(shorter_fp.shape[0]//separate):
-            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[1]-1), :]
-            sim_idx = [0]
-            for longer_idx in range(longer_fp.shape[0]-separate):
-                longer_sample = longer_fp[longer_idx:longer_idx+separate, :]
-                sim_idx.append(BER(shorter_sample, longer_sample))
-            sim.append(max(sim_idx))
-        sim_i.append(np.mean(sim))
-    return max(sim_i)
+            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :]
+            #sim_idx = [0]
+            sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
+            sim_idx[-1] = 0
+            for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
+                longer_sample = longer_fp[longer_idx:shorter_sample.shape[0], :]
+                #sim_idx.append(BER(shorter_sample, longer_sample))
+                sim_idx[longer_idx] = BER(shorter_sample, longer_sample)
+            #sim.append(max(sim_idx))
+            sim[shorter_idx] = np.max(sim_idx)
+        #sim_i.append(np.mean(sim))
+        sim_i[i] = np.mean(sim)
+    return np.max(sim_i)
 
 def compare_fp_chroma(fp1, fp2):
-    def BER(s1, s2):
-        if s1.shape[0] == 0:
-            return 0
-        result = 0
-        for i in range(s1.shape[0]):
-            result += np.mean(~(s1[i,:] ^ s2[i,:-12]))
-        return result/s1.shape[0]
+    """
+    input:
+        fp1 np.ndarray, shape=(len(beats), 12(nbin))
+        fp2 np.ndarray, shape=(len(beats), 12(nbin))
+    output float64: simirality of fp1, fp2
+    """
 
-    separate = 32
+    separate = 64
     shorter_fp = fp1
     longer_fp = fp2
     if fp1.shape[0] > fp2.shape[0]:
         shorter_fp = fp2
         longer_fp = fp1
-    sim_i = []
+    sim_i = np.empty(12)
     for i in range(12):
-        rolled_shorter_fp = np.roll(shorter_fp, i, axis=0)
-        sim = []
+        rolled_shorter_fp = np.roll(shorter_fp, i, axis=1)
+        sim = np.empty(shorter_fp.shape[0]//separate)
         for shorter_idx in range(shorter_fp.shape[0]//separate):
-            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[1]-1), :]
-            sim_idx = [0]
-            for longer_idx in range(longer_fp.shape[0]-separate):
-                longer_sample = longer_fp[longer_idx:longer_idx+separate, :]
-                sim_idx.append(BER(shorter_sample, longer_sample))
-            sim.append(max(sim_idx))
-        sim_i.append(np.mean(sim))
-    return max(sim_i)
+            shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :]
+            sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
+            sim_idx[-1] = 0
+            for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
+                longer_sample = longer_fp[longer_idx:longer_idx+shorter_sample.shape[0], :]
+                sim_idx[longer_idx] = fp_cossim(shorter_sample, longer_sample)
+            sim[shorter_idx] = np.max(sim_idx)
+        sim_i[i] = np.mean(sim)
+    return np.max(sim_i)
 
 def compare(input_music, database_music):
     """
@@ -322,8 +342,9 @@ def compare(input_music, database_music):
     """
     sim_melody = compare_melody(input_music.melody, database_music.melody)
     #sim_acc = compare_acc(input.acc, data.acc)
-    #sim_chords = compare_acc(input_music.chords, database_music.chords)
-    sim_chords = compare_fp(input_music.fingerprint, database_music.fingerprint)
+    sim_chords = compare_acc(input_music.chords, database_music.chords)
+    #sim_chords = compare_fp(input_music.fingerprint, database_music.fingerprint)
+    #sim_chords = compare_fp_chroma(input_music.fingerprint, database_music.fingerprint)
     return sim_melody,  sim_chords
 
 # def spleeter_4stems_separate(y, sep=20000000):
@@ -594,9 +615,9 @@ class Music:
         vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)
         self.sep_beats(self.quantize)
         self.melody = sep_count(vocals_f0)
-        #self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
-        self.fingerprint = self.cqt_beat_AF()
-        print(self.fingerprint.shape)
+        self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
+        #self.fingerprint = self.cqt_beat_AF()
+        #self.fingerprint = self.chroma_beat_AF()
     # def separate_music(self):
     #     self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)
     def sep_beats(self, quantize):
@@ -610,24 +631,22 @@ class Music:
     def cqt_beat_AF(self):
         nbin_beat_sum = lambda nbin, beat: np.sum(y_cqt[nbin][beat:beat+1])
         y_cqt = np.abs(librosa.cqt(librosa.to_mono(self.y)))
-        result = []
+        result = np.empty((len(self.beats), 83), dtype=bool)
         for beat_idx, beat in enumerate(self.beats[:-2]):
             beat_result = np.empty(y_cqt.shape[0]-1, dtype=bool)
             for nbin in range(y_cqt.shape[0]-1):
-                tmp = nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
-                        - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat)
-                beat_result[nbin] = tmp > 0
-            result.append(beat_result)
-        return np.array(result)
+                result[beat_idx, nbin] = nbin_beat_sum(nbin+1, beat) - nbin_beat_sum(nbin+1, beat+1) \
+                        - (nbin_beat_sum(nbin, beat) - nbin_beat_sum(nbin, beat+1)) > 0
+        return result
     def chroma_beat_AF(self):
         nbin_beat_sum = lambda nbin, beat: np.sum(y_chroma[nbin][beat:beat+1])
-        y_chroma = librosa.feature.chroma_stft(librosa.to_mono(self.y))
-        result = []
+        y_chroma = librosa.feature.chroma_stft(librosa.to_mono(self.esti_acc))
+        result = np.empty((len(self.beats), 12), dtype=bool)
         for beat_idx, beat in enumerate(self.beats[:-2]):
-            beat_result = np.empty(y_chroma.shape[0]-1, dtype=bool)
             for nbin in range(y_chroma.shape[0]-1):
-                tmp = nbin_beat_sum(nbin+1, beat) + nbin_beat_sum(nbin, beat+1) \
-                        - nbin_beat_sum(nbin+1, beat+1) - nbin_beat_sum(nbin, beat)
-                beat_result[nbin] = tmp > 0
-            result.append(beat_result)
-        return np.array(result)
+                result[beat_idx, nbin] = nbin_beat_sum(nbin+1, beat) - nbin_beat_sum(nbin+1, beat+1) \
+                        - (nbin_beat_sum(nbin, beat) - nbin_beat_sum(nbin, beat+1)) > 0
+            result[beat_idx, 11] = \
+                nbin_beat_sum(0, beat) + nbin_beat_sum(0, beat+1) \
+                    - (nbin_beat_sum(11, beat) - nbin_beat_sum(11, beat+1)) > 0
+        return result

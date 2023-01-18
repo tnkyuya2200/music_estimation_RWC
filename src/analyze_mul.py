@@ -13,9 +13,8 @@ def task(ID):
     db = fn.Database(sys.argv[1])
     m = db.load_Music_by_ID(ID)
     m.load_and_analyze_music()
-    data = (m.y, m.sr, m.beats, m.bpm, m.frame_size, m.quantize, m.melody, m.chords, m.fingerprint, m.ID)
-    db.cur.execute(query, data)
     print("\tID:", ID, "ended")
+    return (m.y, m.sr, m.beats, m.bpm, m.frame_size, m.quantize, m.melody, m.chords, m.fingerprint, m.ID)
 
 
 def main():
@@ -28,8 +27,8 @@ def main():
                 task, ID
                 )
             futures.append(future)
-        #data = [f.result() for f in futures]
-    #db.cur.executemany(query, data)
+        data = [f.result() for f in futures]
+    db.cur.executemany(query, data)
 
 if __name__ == "__main__":
     main()

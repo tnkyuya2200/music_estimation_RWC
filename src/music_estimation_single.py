@@ -11,52 +11,71 @@ from tqdm import tqdm
 import joblib
 from pathos.multiprocessing import ProcessingPool
 from typing import Optional
+import concurrent.futures
+import copy
+import time
 warnings.simplefilter("error")
 
-def task(test_music, test_music_q2, x, x_q2, ID):
-	tmp_dict = {"ID":ID, "sim":{}}
-	#x = db.load_Music_by_ID(ID)
-	vocal_sim, chords_sim = (0, 0)
-	if test_music.bpm < x.bpm*3/4:
-		#x_q2 = db.load_Music_by_ID(ID)
-		x_q2.analyze_music(2)
-		vocal_sim, chords_sim = fn.compare(test_music, x_q2)
-	elif test_music.bpm > x.bpm*3/2:
-		vocal_sim, chords_sim = fn.compare(test_music_q2, x)
-	else:
-		vocal_sim, chords_sim = fn.compare(test_music, x)
-	tmp_dict["sim"]["vocal"] = vocal_sim
-	tmp_dict["sim"]["chords"] = chords_sim
-	tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
-	return tmp_dict
+def task(test_music, test_music_q2, ID):
+    print("ID:", ID, "started!")
+    db = fn.Database(sys.argv[1])
+    x = db.load_Music_by_ID(ID)
+    tmp_dict = {"ID":ID, "sim":{}}
+    #x = db.load_Music_by_ID(ID)
+    vocal_sim, chords_sim = (0, 0)
+    if test_music.bpm < x.bpm*3/4:
+        #x_q2 = db.load_Music_by_ID(ID)
+        x_q2 = copy.deepcopy(x)
+        x_q2.analyze_music(2)
+        vocal_sim, chords_sim = fn.compare(test_music, x_q2)
+    elif test_music.bpm > x.bpm*3/2:
+        vocal_sim, chords_sim = fn.compare(test_music_q2, x)
+    else:
+        vocal_sim, chords_sim = fn.compare(test_music, x)
+    tmp_dict["sim"]["vocal"] = vocal_sim
+    tmp_dict["sim"]["chords"] = chords_sim
+    tmp_dict["sim"]["average"] = np.mean((vocal_sim, chords_sim))
+    print("\tID:", ID, "ended!")
+    return tmp_dict
 
 def main():
-	db = fn.Database(sys.argv[1])
-	IDs = db.getIDlist()
+    time_start = time.perf_counter()
+    db = fn.Database(sys.argv[1])
+    #IDs = db.getIDlist()
+    ID = sys.argv[2]
 
-	result = {"test_file": sys.argv[2]}
-	result["db"] = [] 
-	filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
-	test_music = db.load_Music_by_ID(0)
-	test_music.analyze_music(4)
-	test_music_q2 = db.load_Music_by_ID(0)
-	test_music_q2.analyze_music(2)
-	
-	x_list = []
-	x_q2_list = []
-	for ID in IDs[1:]:
-		x_list.append(db.load_Music_by_ID(ID))
-		x_q2_list.append(db.load_Music_by_ID(ID))
-	result["db"] = joblib.Parallel(n_jobs=-1, verbose=2)(joblib.delayed(task)(test_music, test_music_q2, x, x_q2, ID) for test_music, test_music_q2, x, x_q2, ID in zip([test_music]*len(IDs), [test_music_q2]*len(IDs), x_list, x_q2_list, IDs[1:]))
+    result = {"test_file": sys.argv[2]}
+    result["db"] = [] 
+    #filename = os.path.join(sys.argv[3], os.path.splitext(os.path.basename(sys.argv[2]))[0] + ".json")
+    filename = sys.argv[3]
+    test_music = db.load_Music_by_ID(0)
+    test_music.load_and_analyze_music(4)
+    test_music_q2 = copy.deepcopy(test_music)
+    test_music_q2.analyze_music(2)
+    
+    """
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = []
+        result["db"] = []
+        for ID in IDs[1:]:
+            future = executor.submit(
+                task, test_music, test_music_q2, ID
+                )
+            futures.append(future)
+        result["db"] = [f.result() for f in futures]
+    result["timestamp"] = datetime.now().isoformat()
+    result["elap_time"] = time.perf_counter() - time_start
+    """
+    result = task(test_music, test_music_q2, ID)
+    result["timestamp"] = datetime.now().isoformat()
+    result["elap_time"] = time.perf_counter() - time_start
 
-	result["timestamp"] = datetime.now().isoformat()
+    file = open(filename, "w", encoding="utf-8")
+    json.dump(result, file, indent=2, ensure_ascii=False)
+    file.close()
+    print("written " + filename)
 
-	file = open(filename, "w", encoding="utf-8")
-	json.dump(result, file, indent=2, ensure_ascii=False)
-	file.close()
-	print("written " + filename)
-
-	#os.system("shutdown -s -t 60")
+    os.system("shutdown -s -t 60")
 
 if __name__ == "__main__":
-	main()
+    main()
