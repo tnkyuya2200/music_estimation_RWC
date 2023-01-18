@@ -16,10 +16,10 @@ import copy
 import time
 warnings.simplefilter("error")
 
-def task(test_music, test_music_q2, x, ID):
+def task(test_music, test_music_q2, ID):
     print("ID:", ID, "started!")
     tmp_dict = {"ID":ID, "sim":{}}
-    #x = db.load_Music_by_ID(ID)
+    x = fn.Database(sys.argv[1]).load_Music_by_ID(ID)
     vocal_sim, chords_sim = (0, 0)
     if test_music.bpm < x.bpm*3/4:
         #x_q2 = db.load_Music_by_ID(ID)
@@ -57,8 +57,7 @@ def main():
         result["db"] = []
         for ID in IDs[1:]:
             future = executor.submit(
-                task, test_music, test_music_q2,
-                db.load_Music_by_ID(ID), ID
+                task, test_music, test_music_q2, ID
                 )
             futures.append(future)
         result["db"] = [f.result() for f in futures]

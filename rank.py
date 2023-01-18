@@ -40,7 +40,10 @@ def main():
         deno = data["deno"]
         print(test_type, end="\t")
         for attr in attr_list:
-            score[attr] = data[attr] / deno * 100
+            if deno == 0:
+                score[attr] = 0
+            else:
+                score[attr] = data[attr] / deno * 100
             #print("{: >6.2f}".format(score[attr]*100), "%", "(", data[attr], "/", data["deno"], ")", end="\t")
             print(f"{score[attr]: >8.2f} %  ({data[attr]: >4}/{deno: >4})\t", end="")
         print()
