@@ -11,38 +11,40 @@ import os
 import csv
 import warnings
 
-def make_chorddict():
-    chord_dic = OrderedDict()
-    one_third = 1.0/3
-    #major chords
-    chord_dic["C"] = [one_third, 0,0,0, one_third, 0,0, one_third, 0,0,0,0]
-    chord_dic["Db"] = [0, one_third, 0,0,0, one_third, 0,0, one_third, 0,0,0]
-    chord_dic["D"] = [0,0, one_third, 0,0,0, one_third, 0,0, one_third, 0,0]
-    chord_dic["Eb"] = [0,0,0, one_third, 0,0,0, one_third, 0,0, one_third, 0]
-    chord_dic["E"] = [0,0,0,0, one_third, 0,0,0, one_third, 0,0, one_third]
-    chord_dic["F"] = [one_third, 0,0,0,0, one_third, 0,0,0, one_third, 0,0]
-    chord_dic["Gb"] = [0, one_third, 0,0,0,0, one_third, 0,0,0, one_third, 0]
-    chord_dic["G"] = [0,0, one_third, 0,0,0,0, one_third, 0,0,0, one_third]
-    chord_dic["Ab"] = [one_third, 0,0, one_third, 0,0,0,0, one_third, 0,0,0]
-    chord_dic["A"] = [0, one_third, 0,0, one_third, 0,0,0,0, one_third, 0,0]
-    chord_dic["Bb"] = [0,0, one_third, 0,0, one_third, 0,0,0,0, one_third, 0]
-    chord_dic["B"] = [0,0,0, one_third, 0,0, one_third, 0,0,0,0, one_third]
-    #minor chords
-    chord_dic["Cm"] = [one_third, 0,0, one_third, 0,0,0, one_third, 0,0,0,0]
-    chord_dic["Dbm"] = [0, one_third, 0,0, one_third, 0,0,0, one_third, 0,0,0]
-    chord_dic["Dm"] = [0,0, one_third, 0,0, one_third, 0,0,0, one_third, 0,0]
-    chord_dic["Ebm"] = [0,0,0, one_third, 0,0, one_third, 0,0,0, one_third, 0]
-    chord_dic["Em"] = [0,0,0,0, one_third, 0,0, one_third, 0,0,0, one_third]
-    chord_dic["Fm"] = [one_third, 0,0,0,0, one_third, 0,0, one_third, 0,0,0]
-    chord_dic["Gbm"] = [0, one_third, 0,0,0,0, one_third, 0,0, one_third, 0,0]
-    chord_dic["Gm"] = [0,0, one_third, 0,0,0,0, one_third, 0,0, one_third, 0]
-    chord_dic["Abm"] = [0,0,0, one_third, 0,0,0,0, one_third, 0,0, one_third]
-    chord_dic["Am"] = [one_third, 0,0,0, one_third, 0,0,0,0, one_third, 0,0]
-    chord_dic["Bbm"] = [0, one_third, 0,0,0, one_third, 0,0,0,0, one_third, 0]
-    chord_dic["Bm"] = [0,0, one_third, 0,0,0, one_third, 0,0,0,0, one_third]
-    return chord_dic
+chord_dic = [[1,0,0,0,1,0,0,1,0,0,0,0],   #C
+[0,1,0,0,0,1,0,0,1,0,0,0],   #Db
+[0,0,1,0,0,0,1,0,0,1,0,0],   #D
+[0,0,0,1,0,0,0,1,0,0,1,0],   #Eb
+[0,0,0,0,1,0,0,0,1,0,0,1],   #E
+[1,0,0,0,0,1,0,0,0,1,0,0],   #F
+[0,1,0,0,0,0,1,0,0,0,1,0],   #Gb
+[0,0,1,0,0,0,0,1,0,0,0,1],   #G
+[1,0,0,1,0,0,0,0,1,0,0,0],   #Ab
+[0,1,0,0,1,0,0,0,0,1,0,0],   #A
+[0,0,1,0,0,1,0,0,0,0,1,0],   #Bb
+[0,0,0,1,0,0,1,0,0,0,0,1],   #B
+#minor chords
+[1,0,0,1,0,0,0,1,0,0,0,0],   #Cm
+[0,1,0,0,1,0,0,0,1,0,0,0],   #Dbm
+[0,0,1,0,0,1,0,0,0,1,0,0],   #Dm
+[0,0,0,1,0,0,1,0,0,0,1,0],   #Ebm
+[0,0,0,0,1,0,0,1,0,0,0,1],   #Em
+[1,0,0,0,0,1,0,0,1,0,0,0],   #Fm
+[0,1,0,0,0,0,1,0,0,1,0,0],   #Gbm
+[0,0,1,0,0,0,0,1,0,0,1,0],   #Gm
+[0,0,0,1,0,0,0,0,1,0,0,1],   #Abm
+[1,0,0,0,1,0,0,0,0,1,0,0],   #Am
+[0,1,0,0,0,1,0,0,0,0,1,0],   #Bbm
+[0,0,1,0,0,0,1,0,0,0,0,1]]   #Bm
 
-chord_dic = make_chorddict()
+def pre_cos_sim(chord_dic = chord_dic):
+    result = np.empty((24, 24))
+    deno = np.linalg.norm(chord_dic[0]) * np.linalg.norm(chord_dic[0])
+    for i, datai in enumerate(chord_dic):
+        for j, dataj in enumerate(chord_dic):
+            result[i][j] = np.dot(datai, dataj) / deno
+    return result
+
 
 def estimate_chord(chroma, chord_dic=chord_dic):
     """
@@ -53,7 +55,7 @@ def estimate_chord(chroma, chord_dic=chord_dic):
     """
     maximum = -1
     this_chord = np.zeros(12)
-    for chord_index, (name, vector) in enumerate(chord_dic.items()):
+    for chord_index, vector in enumerate(chord_dic):
         similarity = cos_sim(chroma, vector)
         if similarity > maximum:
             maximum = similarity
