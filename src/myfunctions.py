@@ -42,24 +42,25 @@ def pre_cos_sim(chord_dic = chord_dic):
     deno = np.linalg.norm(chord_dic[0]) * np.linalg.norm(chord_dic[0])
     for i, datai in enumerate(chord_dic):
         for j, dataj in enumerate(chord_dic):
-            result[i][j] = np.dot(datai, dataj) / deno
+            result[i][j] = np.dot(datai, dataj) / 3
     return result
 
+sim_chords = pre_cos_sim()
 
 def estimate_chord(chroma, chord_dic=chord_dic):
     """
     input:
         chroma np.ndarray, shape(12,): chroma vector
         chord_dic dict: chord dictionary
-    output np.ndarray, shape=(12,): most similar chord vector
+    output int: most similar chord idx
     """
     maximum = -1
-    this_chord = np.zeros(12)
+    this_chord = 0
     for chord_index, vector in enumerate(chord_dic):
         similarity = cos_sim(chroma, vector)
         if similarity > maximum:
             maximum = similarity
-            this_chord = vector
+            this_chord = chord_index
     return this_chord
 
 def estimate_chords(chromas, chord_dic=chord_dic):
@@ -67,11 +68,11 @@ def estimate_chords(chromas, chord_dic=chord_dic):
     input:
         output np.ndarray, shape=(12,len(beats)): analyzed chroma in beats
         chord_dic dict: chord dictionary
-    output np.ndarray, shape=(12, len(beats)): most similar chords in beats
+    output np.ndarray, shape=(len(beats)): most similar chords in beats
     """
-    result = np.empty(chromas.shape)
+    result = np.empty(chromas.shape[1], dtype=np.int8)
     for i in range(chromas.shape[1]):
-        result[:,i] = estimate_chord(chromas[:,i], chord_dic)
+        result[i] = estimate_chord(chromas[:,i], chord_dic)
     return result
 
 def chroma_in_beats(acc_wav, sr, beats):
@@ -158,41 +159,56 @@ def compare_melody(input_melody, database_melody):
         database_melody: melody2 to compare: np.ndarray, shape=(count, array)
     output float64: simirality score
     """
-    sim = []
+    #sim = []
+    sim = np.empty(len(database_melody))
     for index_db in range(len(database_melody)):
         db_sample = database_melody[index_db]
-        sim_db = [0]
+        #sim_db = [0]
+        sim_db = np.empty(len(input_melody)+1)
+        sim_db[-1] = 0
         for index_input in range(len(input_melody)):
             input_sample = input_melody[index_input]
-            sim_lag = [0]
+            #sim_lag = [0]
+            sim_lag = np.empty(abs(len(input_sample)-len(db_sample))+2)
+            sim_lag[-1] = 0
             if len(input_sample) > len(db_sample):
                 for lag in range(len(input_sample)-len(db_sample)+1):
-                    diff = []
+                    #diff = []
+                    diff = np.empty(len(db_sample))
                     both_nan = 0
                     for i in range(len(db_sample)):
-                        diff.append((input_sample[i+lag] - db_sample[i]))
+                        #diff.append((input_sample[i+lag] - db_sample[i]))
+                        diff[i] = input_sample[i+lag] - db_sample[i]
                         if np.isnan(input_sample[i+lag]) and np.isnan(db_sample[i]):
                             both_nan += 1
                     if not all(np.isnan(diff)):
                         med = np.median([x for x in diff if not np.isnan(x)])
-                        sim_lag.append((len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff))
+                        #sim_lag.append((len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff))
+                        sim_lag[lag] = (len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff)
                     else:
-                        sim_lag.append(0)
+                        #sim_lag.append(0)
+                        sim_lag[lag] = 0
             else:
                 for lag in range(len(db_sample)-len(input_sample)+1):
-                    diff = []
+                    #diff = []
+                    diff = np.empty(len(input_sample))
                     both_nan = 0
                     for i in range(len(input_sample)):
-                        diff.append((input_sample[i] - db_sample[i+lag]))
+                        #diff.append((input_sample[i] - db_sample[i+lag]))
+                        diff[i] = input_sample[i] - db_sample[i+lag]
                         if np.isnan(input_sample[i]) and np.isnan(db_sample[i+lag]):
                             both_nan += 1
                     if not all(np.isnan(diff)):
                         med = np.median([x for x in diff if not np.isnan(x)])
-                        sim_lag.append((len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff))
+                        #sim_lag.append((len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff))
+                        sim_lag[lag] = (len([x for x in diff if abs(x-med)<=0.6])+both_nan) / len(diff)
                     else:
-                        sim_lag.append(0)
-            sim_db.append(max(sim_lag))
-        sim.append(max(sim_db))
+                        #sim_lag.append(0)
+                        sim_lag[lag] = 0
+            #sim_db.append(max(sim_lag))
+            sim_db[index_input] = max(sim_lag)
+        #sim.append(max(sim_db))
+        sim[index_db] = max(sim_db)
     return np.mean(sim)
 
 def cos_sim(v1,v2):
@@ -202,7 +218,8 @@ def cos_sim(v1,v2):
         v2 array: vector
     output float64: cosine simirality of v1, v2
     """
-    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    #return sim_chords[v1, v2]
+    return np.dot(v1, v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
 
 def corr_cossim(data1, data2):
     """
@@ -212,39 +229,65 @@ def corr_cossim(data1, data2):
     output float64: cosine simirality for different size vector
     calcurates mean vector cosine simirality
     """
-    sim_i = []
-    for i in range(min(data1.shape[1], data2.shape[1])):
-        sim_i.append(cos_sim(data1[:,i], data2[:,i]))
-    return np.mean(sim_i)
+    length = min(data1.shape[0], data2.shape[0])
+    if length == 0:
+        return 0
+    #sim_i = []
+    #sim_i = np.empty(min(data1.shape[0], data2.shape[0]))
+    result = 0
+    for i in range(length):
+        #sim_i.append(cos_sim(data1[i], data2[i]))
+        #sim_i[i] = sim_chords[data1[i], data2[i]]
+        result += sim_chords[data1[i], data2[i]]
+    return result/length
+    #return np.mean(sim_i)
+
+def roll_chords(acc, i):
+    """
+    result = np.empty(acc.shape, dtype="int8")
+    for idx, data in enumerate(acc):
+        if data < 12:
+            result[idx] = (data+i)%12
+        else:
+            result[idx] = (data-12+i)%12+12
+    """
+    return np.array([(data+i)%12 if data<12 else (data-12+i)%12+12 for data in acc])
 
 def compare_acc(acc1, acc2, separate=64):
     """
     input:
-        acc1 np.ndarray, shape=(12,len(beats)): input acc
-        acc2 np.ndarray, shape=(12,len(beats)): database acc
+        acc1 np.ndarray, shape=(len(beats)): input acc
+        acc2 np.ndarray, shape=(len(beats)): database acc
         separate int: separate shorter acc by separate
     output float64: simirality of acc1 and acc2
     """
     shorter_acc = None
     longer_acc = None
-    if acc1.shape[1] < acc2.shape[1]:
+    if acc1.shape[0] < acc2.shape[0]:
         shorter_acc = acc2
         longer_acc = acc1
     else:
         shorter_acc = acc1
         longer_acc = acc2
-    sim_i = []
+    #sim_i = []
+    sim_i = np.empty(12)
     for i in range(12):
-        rolled_shorter_acc = np.roll(shorter_acc, i, axis=0)
-        sim = []
-        for index_shorter in range(shorter_acc.shape[1]//separate):
-            shorter_sample = rolled_shorter_acc[:,index_shorter*separate:min((index_shorter+1)*separate, shorter_acc.shape[1]-1)]
-            sim_index = [0]
-            for index_longer in range(longer_acc.shape[1]-separate):
-                longer_sample = longer_acc[:,index_longer:index_longer+separate]
-                sim_index.append(corr_cossim(shorter_sample, longer_sample))
-            sim.append(max(sim_index))
-        sim_i.append(np.mean(sim))
+        rolled_shorter_acc = roll_chords(shorter_acc, i)
+        #sim = []
+        sim = np.empty(shorter_acc.shape[0]//separate)
+        for index_shorter in range(shorter_acc.shape[0]//separate):
+            shorter_sample = rolled_shorter_acc[index_shorter*separate:min((index_shorter+1)*separate, shorter_acc.shape[0]-1)]
+            #sim_index = [0]
+            sim_index = np.empty(longer_acc.shape[0]-shorter_sample.shape[0]+1)
+            sim_index[-1] = 0
+            for index_longer in range(longer_acc.shape[0]-shorter_sample.shape[0]):
+                longer_sample = longer_acc[index_longer:index_longer+shorter_sample.shape[0]]
+                #sim_index.append(corr_cossim(shorter_sample, longer_sample))
+                sim_index[index_longer] = corr_cossim(shorter_sample, longer_sample)
+            #sim.append(max(sim_index))
+            sim[index_shorter] = max(sim_index)
+        #sim_i.append(np.mean(sim))
+        sim_i[i] = np.mean(sim)
     return max(sim_i)
 
 def compare(input_music, database_music):
@@ -311,16 +354,20 @@ def f0_in_beats(vocals, beats, sr, quantize=8):
     """
     q_beats = sep_quantize(beats, 8)
     f0 = (list(map(lambda x:round(x-12), librosa.hz_to_midi(librosa.yin(librosa.to_mono(vocals),fmin=65,fmax=2093,sr=sr)))))
-    output = []
+    #output = []
+    output = np.empty(len(q_beats)-1)
     threshold = np.percentile(abs(vocals), 25)
     mono_vocals = librosa.to_mono(vocals)
     for index in range(len(q_beats)-1):
         note = np.median(f0[q_beats[index]:q_beats[index+1]])
         if np.median(np.abs(mono_vocals[q_beats[index]*512:q_beats[index+1]*512])) < threshold or note >= 80 :
-            output.append(np.nan)
+            #output.append(np.nan)
+            output[index] = np.nan
         else:
-            output.append(note)
-    return np.array(output)
+            #output.append(note)
+            output[index] = note
+    return output
+    #return np.array(output)
 
 def compare_all(test_music, db):
     """
@@ -509,7 +556,7 @@ class Music:
     esti_vocals = None  # estimated vocals                      np.ndarray, shape=(2,samples)
     esti_acc = None     # estimated acc                         np.ndarray, shape=(2,samples)
     melody = None       # analyzed cqt_bins in each beats       np.ndarray, shape=(len(beats),)
-    chords = None       # analyzed chords                       np.ndarray, shape=(12,len(beats))
+    chords = None       # analyzed chords                       np.ndarray, shape=(len(beats))
 
     def load_music(self, FilePath):
         self.ID = 0

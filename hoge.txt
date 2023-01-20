@@ -1,0 +1,91 @@
+testdata/test_vocals2/100_speed_0.82.wav
+insert
+separate
+2023-01-20 14:55:26.549911: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2023-01-20 14:55:27.636551: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcuda.so.1
+2023-01-20 14:55:28.468335: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:28.468448: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 3070 Laptop GPU computeCapability: 8.6
+coreClock: 1.29GHz coreCount: 40 deviceMemorySize: 7.79GiB deviceMemoryBandwidth: 357.69GiB/s
+2023-01-20 14:55:28.468475: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2023-01-20 14:55:28.471062: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublas.so.11
+2023-01-20 14:55:28.471149: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublasLt.so.11
+2023-01-20 14:55:28.471830: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcufft.so.10
+2023-01-20 14:55:28.472045: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcurand.so.10
+2023-01-20 14:55:28.472673: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusolver.so.11
+2023-01-20 14:55:28.473240: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcusparse.so.11
+2023-01-20 14:55:28.473372: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudnn.so.8
+2023-01-20 14:55:28.473449: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:28.473562: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:28.473630: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+WARNING:tensorflow:From /home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/spleeter/separator.py:146: calling DatasetV2.from_generator (from tensorflow.python.data.ops.dataset_ops) with output_types is deprecated and will be removed in a future version.
+Instructions for updating:
+Use output_signature instead
+WARNING:tensorflow:From /home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/spleeter/separator.py:146: calling DatasetV2.from_generator (from tensorflow.python.data.ops.dataset_ops) with output_shapes is deprecated and will be removed in a future version.
+Instructions for updating:
+Use output_signature instead
+WARNING:tensorflow:From /home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/tensorflow/python/keras/layers/normalization.py:534: _colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+2023-01-20 14:55:30.572531: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2023-01-20 14:55:30.573171: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.573364: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 3070 Laptop GPU computeCapability: 8.6
+coreClock: 1.29GHz coreCount: 40 deviceMemorySize: 7.79GiB deviceMemoryBandwidth: 357.69GiB/s
+2023-01-20 14:55:30.573472: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.573558: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.573620: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2023-01-20 14:55:30.573659: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudart.so.11.0
+2023-01-20 14:55:30.900599: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1258] Device interconnect StreamExecutor with strength 1 edge matrix:
+2023-01-20 14:55:30.900638: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1264]      0 
+2023-01-20 14:55:30.900644: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 0:   N 
+2023-01-20 14:55:30.900847: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.900980: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.901073: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:30.901155: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 5587 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 3070 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.6)
+2023-01-20 14:55:31.055014: I tensorflow/core/platform/profile_utils/cpu_utils.cc:114] CPU Frequency: 3302400000 Hz
+2023-01-20 14:55:31.679622: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:176] None of the MLIR Optimization Passes are enabled (registered 2)
+2023-01-20 14:55:32.254790: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:32.254896: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1733] Found device 0 with properties: 
+pciBusID: 0000:01:00.0 name: NVIDIA GeForce RTX 3070 Laptop GPU computeCapability: 8.6
+coreClock: 1.29GHz coreCount: 40 deviceMemorySize: 7.79GiB deviceMemoryBandwidth: 357.69GiB/s
+2023-01-20 14:55:32.254985: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:32.255070: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:32.255134: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1871] Adding visible gpu devices: 0
+2023-01-20 14:55:32.255154: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1258] Device interconnect StreamExecutor with strength 1 edge matrix:
+2023-01-20 14:55:32.255159: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1264]      0 
+2023-01-20 14:55:32.255163: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1277] 0:   N 
+2023-01-20 14:55:32.255211: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:32.255315: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:937] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2023-01-20 14:55:32.255386: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1418] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 5587 MB memory) -> physical GPU (device: 0, name: NVIDIA GeForce RTX 3070 Laptop GPU, pci bus id: 0000:01:00.0, compute capability: 8.6)
+2023-01-20 14:55:32.284767: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcufft.so.10
+2023-01-20 14:55:32.427840: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcudnn.so.8
+2023-01-20 14:55:32.868424: I tensorflow/stream_executor/cuda/cuda_dnn.cc:359] Loaded cuDNN version 8100
+2023-01-20 14:55:33.448818: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublas.so.11
+2023-01-20 14:55:33.840410: I tensorflow/stream_executor/platform/default/dso_loader.cc:53] Successfully opened dynamic library libcublasLt.so.11
+2023-01-20 14:55:35.873290: W tensorflow/core/kernels/data/generator_dataset_op.cc:107] Error occurred when finalizing GeneratorDataset iterator: Failed precondition: Python interpreter state is not initialized. The process may be terminated.
+	 [[{{node PyFunc}}]]
+estimation
+Traceback (most recent call last):
+  File "src/music_estimation.py", line 75, in <module>
+    main()
+  File "src/music_estimation.py", line 50, in main
+    test_music_q2.analyze_music(2)
+  File "/home/tanaka/workspace/music_estimation_RWC/src/myfunctions.py", line 577, in analyze_music
+    self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
+  File "/home/tanaka/workspace/music_estimation_RWC/src/myfunctions.py", line 87, in chroma_in_beats
+    chroma = librosa.feature.chroma_cens(librosa.to_mono(acc_wav), sr)
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/librosa/feature/spectral.py", line 1592, in chroma_cens
+    chroma = chroma_cqt(
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/librosa/feature/spectral.py", line 1434, in chroma_cqt
+    cqt_func[cqt_mode](
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/librosa/core/constantq.py", line 185, in cqt
+    return vqt(
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/librosa/core/constantq.py", line 1004, in vqt
+    my_y = audio.resample(my_y, 2, 1, res_type=res_type, scale=True)
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/librosa/core/audio.py", line 584, in resample
+    y_hat = resampy.resample(y, orig_sr, target_sr, filter=res_type, axis=-1)
+  File "/home/tanaka/.conda/envs/py38_GPU/lib/python3.8/site-packages/resampy/core.py", line 120, in resample
+    resample_f(x_2d, y_2d, sample_ratio, interp_win, interp_delta, precision)
+KeyboardInterrupt
