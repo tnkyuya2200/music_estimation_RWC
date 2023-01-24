@@ -278,10 +278,10 @@ def compare_acc(acc1, acc2, separate=64):
         for index_shorter in range(shorter_acc.shape[0]//separate):
             shorter_sample = rolled_shorter_acc[index_shorter*separate:min((index_shorter+1)*separate, shorter_acc.shape[0]-1)]
             #sim_index = [0]
-            sim_index = np.empty(longer_acc.shape[0]-shorter_sample.shape[0]+1)
+            sim_index = np.empty(longer_acc.shape[0]-separate+1)
             sim_index[-1] = 0
-            for index_longer in range(longer_acc.shape[0]-shorter_sample.shape[0]):
-                longer_sample = longer_acc[index_longer:index_longer+shorter_sample.shape[0]]
+            for index_longer in range(longer_acc.shape[0]-separate):
+                longer_sample = longer_acc[index_longer:index_longer+separate]
                 #sim_index.append(corr_cossim(shorter_sample, longer_sample))
                 sim_index[index_longer] = corr_cossim(shorter_sample, longer_sample)
             #sim.append(max(sim_index))
