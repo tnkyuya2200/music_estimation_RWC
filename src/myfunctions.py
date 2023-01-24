@@ -282,9 +282,9 @@ def compare_fp(fp1, fp2):
         shorter_fp = fp2
         longer_fp = fp1
     #sim_i = []
-    sim_i = np.empty(12)
-    for i in range(12):
-        rolled_shorter_fp = shorter_fp[:, i:-(12-i)]
+    sim_i = np.empty(13)
+    for i in range(7):
+        rolled_shorter_fp = shorter_fp[:, i:-(6-i)]
         #sim = []
         sim = np.empty(shorter_fp.shape[0]//separate)
         for shorter_idx in range(shorter_fp.shape[0]//separate):
@@ -293,13 +293,30 @@ def compare_fp(fp1, fp2):
             sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
             sim_idx[-1] = 0
             for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
-                longer_sample = longer_fp[longer_idx:shorter_sample.shape[0], :]
+                longer_sample = longer_fp[longer_idx:shorter_sample.shape[0], :-6]
                 #sim_idx.append(BER(shorter_sample, longer_sample))
                 sim_idx[longer_idx] = BER(shorter_sample, longer_sample)
             #sim.append(max(sim_idx))
             sim[shorter_idx] = np.max(sim_idx)
         #sim_i.append(np.mean(sim))
         sim_i[i] = np.mean(sim)
+    for i in range(1, 7):
+        rolled_longer_fp = longer_fp[:, i:-(6-i)]
+        #sim = []
+        sim = np.empty(shorter_fp.shape[0]//separate)
+        for shorter_idx in range(shorter_fp.shape[0]//separate):
+            shorter_sample = shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :-6]
+            #sim_idx = [0]
+            sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
+            sim_idx[-1] = 0
+            for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
+                longer_sample = rolled_longer_fp[longer_idx:shorter_sample.shape[0], :]
+                #sim_idx.append(BER(shorter_sample, longer_sample))
+                sim_idx[longer_idx] = BER(shorter_sample, longer_sample)
+            #sim.append(max(sim_idx))
+            sim[shorter_idx] = np.max(sim_idx)
+        #sim_i.append(np.mean(sim))
+        sim_i[6+i] = np.mean(sim)
     return np.max(sim_i)
 
 def compare_fp_chroma(fp1, fp2):
