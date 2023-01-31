@@ -15,7 +15,8 @@ def main():
     #TODO: noise test data
     y_length = m.y.shape[1]
     s = np.random.random(size=y_length)*2 - 1
-    noise_change = round(random.uniform(0.1, 0.3), 2)
+    #noise_change = round(random.uniform(0.1, 0.3), 2)
+    noise_change = 0.2
 
     noise = np.array((s*noise_change, s*noise_change))
     y_with_noise = librosa.util.normalize(m.y + noise, axis=1)

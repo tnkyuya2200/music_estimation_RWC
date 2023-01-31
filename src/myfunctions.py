@@ -205,7 +205,7 @@ def cos_sim(v1,v2):
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 def BER(s1, s2):
-    if s1.shape[0] == 0:
+    if s1.shape[0] == 0 or s2.shape[0] == 0:
         return 0
     result = 0
     for i in range(min(s1.shape[0], s2.shape[0])):
@@ -275,25 +275,28 @@ def compare_fp(fp1, fp2):
     output float64: simirality of fp1, fp2
     """
 
-    separate = 32
-    shorter_fp = fp1
-    longer_fp = fp2
+    separate = 64
+    shorter_fp = None
+    longer_fp = None
     if fp1.shape[0] > fp2.shape[0]:
         shorter_fp = fp2
         longer_fp = fp1
+    else:
+        shorter_fp = fp1
+        longer_fp = fp2
     #sim_i = []
     sim_i = np.empty(13)
     for i in range(7):
-        rolled_shorter_fp = shorter_fp[:, i:-(6-i)]
+        rolled_shorter_fp = shorter_fp[:, i:-(7-i)]
         #sim = []
         sim = np.empty(shorter_fp.shape[0]//separate)
         for shorter_idx in range(shorter_fp.shape[0]//separate):
             shorter_sample = rolled_shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :]
             #sim_idx = [0]
-            sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
+            sim_idx = np.empty(longer_fp.shape[0]-separate+1)
             sim_idx[-1] = 0
-            for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
-                longer_sample = longer_fp[longer_idx:shorter_sample.shape[0], :-6]
+            for longer_idx in range(longer_fp.shape[0]-separate):
+                longer_sample = longer_fp[longer_idx:longer_idx+separate, :-7]
                 #sim_idx.append(BER(shorter_sample, longer_sample))
                 sim_idx[longer_idx] = BER(shorter_sample, longer_sample)
             #sim.append(max(sim_idx))
@@ -301,16 +304,16 @@ def compare_fp(fp1, fp2):
         #sim_i.append(np.mean(sim))
         sim_i[i] = np.mean(sim)
     for i in range(1, 7):
-        rolled_longer_fp = longer_fp[:, i:-(6-i)]
+        rolled_longer_fp = longer_fp[:, i:-(7-i)]
         #sim = []
         sim = np.empty(shorter_fp.shape[0]//separate)
         for shorter_idx in range(shorter_fp.shape[0]//separate):
-            shorter_sample = shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :-6]
+            shorter_sample = shorter_fp[shorter_idx*separate:min((shorter_idx+1)*separate, shorter_fp.shape[0]-1), :-7]
             #sim_idx = [0]
-            sim_idx = np.empty(longer_fp.shape[0]-shorter_sample.shape[0]+1)
+            sim_idx = np.empty(longer_fp.shape[0]-separate+1)
             sim_idx[-1] = 0
-            for longer_idx in range(longer_fp.shape[0]-shorter_sample.shape[0]):
-                longer_sample = rolled_longer_fp[longer_idx:shorter_sample.shape[0], :]
+            for longer_idx in range(longer_fp.shape[0]-separate):
+                longer_sample = rolled_longer_fp[longer_idx:longer_idx+separate, :]
                 #sim_idx.append(BER(shorter_sample, longer_sample))
                 sim_idx[longer_idx] = BER(shorter_sample, longer_sample)
             #sim.append(max(sim_idx))
@@ -359,8 +362,8 @@ def compare(input_music, database_music):
     """
     sim_melody = compare_melody(input_music.melody, database_music.melody)
     #sim_acc = compare_acc(input.acc, data.acc)
-    sim_chords = compare_acc(input_music.chords, database_music.chords)
-    #sim_chords = compare_fp(input_music.fingerprint, database_music.fingerprint)
+    #sim_chords = compare_acc(input_music.chords, database_music.chords)
+    sim_chords = compare_fp(input_music.fingerprint, database_music.fingerprint)
     #sim_chords = compare_fp_chroma(input_music.fingerprint, database_music.fingerprint)
     return sim_melody,  sim_chords
 
@@ -632,8 +635,8 @@ class Music:
         vocals_f0 = f0_in_beats(self.esti_vocals, self.beats, self.sr)
         self.sep_beats(self.quantize)
         self.melody = sep_count(vocals_f0)
-        self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
-        #self.fingerprint = self.cqt_beat_AF()
+        #self.chords = estimate_chords(chroma_in_beats(self.esti_acc, self.sr, self.beats))
+        self.fingerprint = self.cqt_beat_AF()
         #self.fingerprint = self.chroma_beat_AF()
     # def separate_music(self):
     #     self.esti_vocals, self.esti_acc = spleeter_4stems_separate(self.y)

@@ -17,17 +17,17 @@ import time
 warnings.simplefilter("error")
 query = "SELECT "
 
-def task(test_music, test_music_q2, x, ID):
+def task(test_music, test_music_q2, ID):
     print("ID:", ID, "started!")
     db = fn.Database(sys.argv[1])
-    #x = db.load_Music_by_ID(ID)
+    x = db.load_Music_by_ID(ID)
     tmp_dict = {"ID":ID, "sim":{}}
-    #x = db.load_Music_by_ID(ID)
     vocal_sim, chords_sim = (0, 0)
     if test_music.bpm < x.bpm*3/4:
         #x_q2 = db.load_Music_by_ID(ID)
         x_q2 = copy.deepcopy(x)
         x_q2.analyze_music(2)
+        vocals_sim, chords_sim = fn.compare(test_music, x_q2)
     elif test_music.bpm > x.bpm*3/2:
         vocal_sim, chords_sim = fn.compare(test_music_q2, x)
     else:
@@ -59,7 +59,7 @@ def main():
         result["db"] = []
         for ID in IDs[1:]:
             future = executor.submit(
-                task, test_music, test_music_q2, db.load_Music_by_ID(ID), ID
+                task, test_music, test_music_q2, ID
                 )
             futures.append(future)
         result["db"] = [f.result() for f in futures]

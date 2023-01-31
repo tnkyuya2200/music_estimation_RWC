@@ -3,7 +3,7 @@ import sys
 from logging import StreamHandler, Formatter, INFO, getLogger
 from concurrent.futures import ProcessPoolExecutor
 
-db = fn.Database("music.db")
+db = fn.Database(sys.argv[1])
 query = """
     UPDATE features SET y = ?, sr = ?, beats = ?, bpm = ?, frame_size = ?, quantize = ?, melody = ?, chords = ?, fingerprint = ?
         where ID == ?;

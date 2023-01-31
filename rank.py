@@ -34,6 +34,8 @@ def main():
             result_dict[test_type][attr] += (max(db_list, key=lambda x: x["sim"][attr])["ID"] == test_ID)
         sum_time += input_dict["elap_time"]
 
+    hoge = result_dict["all"]["deno"]
+    print(f"{hoge*100/861: >8.2f}% analyzed! ({hoge: >4}/{861: >4})")
     print("type\tvocal\t\t\tchords\t\t\taverage")
     for test_type, data in result_dict.items():
         score = {}
